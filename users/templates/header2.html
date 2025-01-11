@@ -1,0 +1,19 @@
+{% load static %}
+
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <a href="{% url 'company_dashboard' %}">
+                <img src="{% static 'images/Bcommune_logo.png' %}" alt="Bcommune Logo">
+            </a>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="   Search for jobs, skills, etc." />
+        </div>
+        <nav>
+            <a href="{% url 'myjobs' %}">My Jobs</a>
+            <a href="#">Notifications</a>
+            <a href="#">My Profile</a>
+        </nav>
+    </div>
+</header>

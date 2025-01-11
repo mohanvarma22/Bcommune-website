@@ -1,0 +1,95 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/homepage.css'%}">
+    <link rel="stylesheet" href="{% static 'css/individualmyjobs.css'%}">
+</head>
+<body>
+
+    {% include 'header1.html' %}
+    
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        {% include 'sidebar.html' %}
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2>My Dashboard</h2>
+
+            <!-- Ideas Section -->
+            <section id="ideas">
+                <h3>Ideas You Have Submitted</h3>
+                <div class="cards-container">
+                    {% for idea in ideas %}
+                        <div class="card">
+                            <h4>{{ idea.title }}</h4>
+                            <p>{{ idea.brief_description }}</p>
+                            <p><strong>Problem:</strong> {{ idea.problem_statement }}</p>
+                            <p><strong>Solution:</strong> {{ idea.solution }}</p>
+                            <p><strong>Required Fund:</strong> ₹{{ idea.fund_required }}</p>
+                            <p><strong>Category:</strong> {{ idea.category }}</p>
+                            <!-- {% if idea.photo %}
+                                <img src="{{ idea.photo.url }}" alt="Idea Photo">
+                            {% endif %}
+                            {% if idea.video %}
+                                <video controls>
+                                    <source src="{{ idea.video.url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% endif %} -->
+                            <hr>
+                        </div>
+                    {% empty %}
+                        <p>No ideas submitted yet.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Jobs Section -->
+            <section id="jobs">
+                <h3>Jobs</h3>
+                <div class="cards-container">
+                    {% for job in jobs %}
+                        <div class="card">
+                            <h4>{{ job.title }}</h4>
+                            <p><strong>Company:</strong> {{ job.company }}</p>
+                            <p><strong>Location:</strong> {{ job.location }}</p>
+                            <p>{{ job.description }}</p>
+                            <p><strong>Requirements:</strong></p>
+                            <p>{{ job.requirements }}</p>
+                            <p class="posted-date">Posted: {{ job.posted_date|date:"M d, Y" }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No jobs available at the moment.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Freelance Section -->
+            <section id="freelance">
+                <h3>Freelance for a Project</h3>
+                <div class="cards-container" id="freelance-container"></div>
+            </section>
+
+            <!-- Internships Section -->
+            <section id="internships">
+                <h3>Internships</h3>
+                <div class="cards-container" id="internships-container"></div>
+            </section>
+
+            <!-- Startups Section -->
+            <section id="startups">
+                <h3>Become a core member of startups</h3>
+                <div class="cards-container" id="startups-container"></div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

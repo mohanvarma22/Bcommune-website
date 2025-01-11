@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ idea.title }} - Idea Details</title>
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+    <style>
+        .idea-detail-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .idea-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .idea-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .idea-section h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .idea-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .idea-meta span {
+            background: #e2e8f0;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .fund {
+            color: #48bb78;
+            font-weight: 600;
+        }
+
+        .idea-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .fund-btn {
+            background: #48bb78;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .fund-btn:hover {
+            background: #38a169;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: #2d3748;
+            padding: 0.75rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header2.html' %}
+
+    <div class="main-container">
+        <div class="idea-detail-container">
+            <div class="idea-header">
+                <h1 style="color: white;">{{ idea.title }}</h1>
+                <div class="idea-meta">
+                    <span class="category">{{ idea.category }}</span>
+                    <span class="fund">${{ idea.fund }}</span>
+                    <span class="date">Posted {{ idea.created_at|timesince }} ago</span>
+                </div>
+            </div>
+
+            {% if idea.photo %}
+                <div class="idea-section">
+                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" style="width: 100%;height:100%"; border-radius: 10px;">
+                </div>
+            {% endif %}
+
+            <div class="idea-content">
+                <section class="idea-section">
+                    <h2>Brief Description</h2>
+                    <p>{{ idea.brief_description }}</p>
+                </section>
+
+                {% if idea.patent_number %}
+                    <section class="idea-section">
+                        <h2>Patent Information</h2>
+                        <p><strong>Patent Number:</strong> {{ idea.patent_number }}</p>
+                        {% if idea.application_number %}
+                            <p><strong>Application Number:</strong> {{ idea.application_number }}</p>
+                        {% endif %}
+                    </section>
+                {% endif %}
+
+                <section class="idea-section">
+                    <h2>Problem Statement</h2>
+                    <p>{{ idea.problem_statement }}</p>
+                </section>
+
+                <section class="idea-section">
+                    <h2>Solution</h2>
+                    <p>{{ idea.solution }}</p>
+                </section>
+
+                {% if idea.details %}
+                    <section class="idea-section">
+                        <h2>Additional Details</h2>
+                        <p>{{ idea.details }}</p>
+                    </section>
+                {% endif %}
+
+                {% if idea.team_info %}
+                    <section class="idea-section">
+                        <h2>Team Information</h2>
+                        <p>{{ idea.team_info }}</p>
+                    </section>
+                {% endif %}
+
+                {% if idea.video %}
+                    <section class="idea-section">
+                        <h2>Demo Video</h2>
+                        <video controls style="width: 100%; border-radius: 10px;">
+                            <source src="{{ idea.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </section>
+                {% endif %}
+
+                <div class="idea-actions">
+                    <button class="fund-btn">Fund this Idea</button>
+                    <a href="{% url 'explore_all_ideas' %}" class="back-btn">Back to Ideas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

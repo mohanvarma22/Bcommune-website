@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project</title>
+    <link rel="stylesheet" href="{% static 'css/individualmyjobs.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+</head>
+<body>
+    <div include-html="header2.html"></div>
+    
+    <div class="main-container">
+        <div include-html="sidebarcompany.html"></div>
+        
+        <div class="content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <section class="edit-project-form">
+                <h2>Edit Project</h2>
+                <form method="POST" action="{% url 'edit_project' project.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="title">Project Title</label>
+                        <input type="text" id="title" name="title" value="{{ project.title }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Project Description</label>
+                        <textarea id="description" name="description" required>{{ project.description }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Project Type</label>
+                        <input type="text" id="type" name="type" value="{{ project.project_type }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">Industry</label>
+                        <input type="text" id="industry" name="industry" value="{{ project.industry }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="budget">Budget ($)</label>
+                        <input type="number" id="budget" name="budget" value="{{ project.budget }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeline">Timeline</label>
+                        <input type="date" id="timeline" name="timeline" value="{{ project.timeline|date:'Y-m-d' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" value="{{ project.location }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expertise">Required Expertise</label>
+                        <textarea id="expertise" name="expertise" required>{{ project.expertise_required }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment-terms">Payment Terms</label>
+                        <textarea id="payment-terms" name="payment-terms" required>{{ project.payment_terms }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Requirements:</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="nda" name="nda_required" {% if project.nda_required %}checked{% endif %}>
+                            <label for="nda">NDA Required</label>
+                            
+                            <input type="checkbox" id="confidentiality" name="confidentiality_required" {% if project.confidentiality_required %}checked{% endif %}>
+                            <label for="confidentiality">Confidentiality Required</label>
+                            
+                            <input type="checkbox" id="ip_rights" name="ip_rights_required" {% if project.ip_rights_required %}checked{% endif %}>
+                            <label for="ip_rights">IP Rights Required</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="custom_field">Custom Field</label>
+                        <input type="text" id="custom_field" name="custom_field" value="{{ project.custom_field }}">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Save Changes</button>
+                        <a href="{% url 'myprojects' %}" class="cancel-button">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function includeHTML() {
+            const elements = document.querySelectorAll("[include-html]");
+            elements.forEach((element) => {
+                const file = element.getAttribute("include-html");
+                if (file) {
+                    fetch(file)
+                        .then((response) => {
+                            if (response.ok) return response.text();
+                            throw new Error("Page not found");
+                        })
+                        .then((data) => {
+                            element.innerHTML = data;
+                            element.removeAttribute("include-html");
+                            includeHTML();
+                        })
+                        .catch((error) => console.error(error));
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", includeHTML);
+    </script>
+</body>
+</html>
