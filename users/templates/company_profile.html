@@ -1,0 +1,284 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 20px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .col-md-4, .col-md-8 {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .profile-pic-container {
+            text-align: center;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            object-fit: cover;
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f7f7f7;
+            position: relative;
+        }
+
+        .display-field {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .form-field {
+            display: none;
+        }
+
+        .button-group {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-edit {
+            background-color: #6c757d;
+        }
+
+        .btn-cancel {
+            background-color: #dc3545;
+            display: none;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            display: none;
+        }
+
+        .btn-main-save {
+            background-color: #28a745;
+            display: none;
+            margin: 20px auto;
+            width: 200px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+    <script>
+        let activeSection = null;
+
+        function toggleEdit(sectionId) {
+            const section = document.getElementById(sectionId);
+            const displayFields = section.querySelectorAll('.display-field');
+            const formFields = section.querySelectorAll('.form-field');
+            const editButton = section.querySelector('.btn-edit');
+            const cancelButton = section.querySelector('.btn-cancel');
+            const saveButton = section.querySelector('.btn-save');
+            const mainSaveButton = document.querySelector('.btn-main-save');
+
+            // If this section is already being edited, cancel the edit
+            if (activeSection === sectionId) {
+                displayFields.forEach(field => field.style.display = 'block');
+                formFields.forEach(field => field.style.display = 'none');
+                editButton.style.display = 'block';
+                cancelButton.style.display = 'none';
+                saveButton.style.display = 'none';
+                mainSaveButton.style.display = 'none';
+                activeSection = null;
+            } 
+            // If a different section is being edited, cancel that edit first
+            else {
+                if (activeSection) {
+                    const previousSection = document.getElementById(activeSection);
+                    previousSection.querySelectorAll('.display-field').forEach(field => field.style.display = 'block');
+                    previousSection.querySelectorAll('.form-field').forEach(field => field.style.display = 'none');
+                    previousSection.querySelector('.btn-edit').style.display = 'block';
+                    previousSection.querySelector('.btn-cancel').style.display = 'none';
+                    previousSection.querySelector('.btn-save').style.display = 'none';
+                }
+
+                // Start editing this section
+                displayFields.forEach(field => field.style.display = 'none');
+                formFields.forEach(field => field.style.display = 'block');
+                editButton.style.display = 'none';
+                cancelButton.style.display = 'block';
+                saveButton.style.display = 'block';
+                mainSaveButton.style.display = 'block';
+                activeSection = sectionId;
+            }
+        }
+
+        function saveChanges(sectionId) {
+            // Add your save logic here
+            toggleEdit(sectionId); // This will reset the view
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Company Profile</h1>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Profile Picture and Basic Info -->
+            <div class="section" id="basic-info">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="profile-pic-container">
+                            {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+                            {% else %}
+                            <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture" class="profile-pic">
+                            {% endif %}
+                            <div class="form-field">
+                                <label for="id_profile_picture">Change Profile Picture:</label>
+                                {{ form.profile_picture }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div>
+                            <label>Company Name:</label>
+                            <p class="display-field">{{ user.company_name }}</p>
+                            <div class="form-field">{{ form.company_name }}</div>
+                        </div>
+                        <div>
+                            <label>Contact Number:</label>
+                            <p class="display-field">{{ user.phone_number }}</p>
+                            <div class="form-field">{{ form.phone_number }}</div>
+                        </div>
+                        <div>
+                            <label>Email:</label>
+                            <p class="display-field">{{ user.email }}</p>
+                            <div class="form-field">{{ form.email }}</div>
+                        </div>
+                        <div>
+                            <label>Website:</label>
+                            <p class="display-field">{{ user.company_website }}</p>
+                            <div class="form-field">{{ form.company_website }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-edit" onclick="toggleEdit('basic-info')">Edit</button>
+                    <button type="button" class="btn-cancel" onclick="toggleEdit('basic-info')">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveChanges('basic-info')">Save</button>
+                </div>
+            </div>
+
+            <!-- About the Company Section -->
+            <div class="section" id="about-company">
+                <h3>About the Company</h3>
+                <p class="display-field">{{ user.about_company }}</p>
+                <div class="form-field">
+                    {{ form.about_company }}
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-edit" onclick="toggleEdit('about-company')">Edit</button>
+                    <button type="button" class="btn-cancel" onclick="toggleEdit('about-company')">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveChanges('about-company')">Save</button>
+                </div>
+            </div>
+            
+            <!-- Company Details Section -->
+            <div class="section" id="company-details">
+                <h3>Company Details</h3>
+                <div>
+                    <label>Industry:</label>
+                    <p class="display-field">{{ user.industry }}</p>
+                    <div class="form-field">{{ form.industry }}</div>
+                </div>
+                <div>
+                    <label>Founding Year:</label>
+                    <p class="display-field">{{ user.founding_year }}</p>
+                    <div class="form-field">{{ form.founding_year }}</div>
+                </div>
+                <div>
+                    <label>Company Size:</label>
+                    <p class="display-field">{{ user.company_size }}</p>
+                    <div class="form-field">{{ form.company_size }}</div>
+                </div>
+                <div>
+                    <label>Headquarters:</label>
+                    <p class="display-field">{{ user.headquarters }}</p>
+                    <div class="form-field">{{ form.headquarters }}</div>
+                </div>
+                <div>
+                    <label>Branches/Offices:</label>
+                    <p class="display-field">{{ user.branches }}</p>
+                    <div class="form-field">{{ form.branches }}</div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-edit" onclick="toggleEdit('company-details')">Edit</button>
+                    <button type="button" class="btn-cancel" onclick="toggleEdit('company-details')">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveChanges('company-details')">Save</button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-main-save">Save All Changes</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -19,7 +19,13 @@ class CustomUser(AbstractUser):
     designation = models.CharField(max_length=255, null=True, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     bcommune_profile = models.URLField(null=True, blank=True)
-
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    about_company = models.TextField(null=True, blank=True)  # About the Company
+    founding_year = models.PositiveIntegerField(null=True, blank=True)  # Establishment Year
+    headquarters = models.CharField(max_length=255, null=True, blank=True)  # Headquarters Location
+    branches = models.TextField(null=True, blank=True) 
+    
+    
 
     
 class Idea(models.Model):

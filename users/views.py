@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import Idea, Job, Project, CustomUser, IndividualProfile
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm 
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 
@@ -382,3 +382,20 @@ def edit_individual_profile(request):
 def individual_profile(request):
     profile = get_object_or_404(IndividualProfile, user=request.user)
     return render(request, 'individual_profile.html', {'profile': profile})
+
+
+@login_required
+def company_profile(request):
+    user = request.user
+    if user.user_type != 'company':  # Check the user_type field
+        return redirect('home')  # Redirect if the user is not a company.
+
+    if request.method == 'POST':
+        form = CompanyProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('company_profile')
+    else:
+        form = CompanyProfileForm(instance=user)
+
+    return render(request, 'company_profile.html', {'form': form, 'user': user})

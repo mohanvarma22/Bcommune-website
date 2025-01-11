@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -136,4 +137,4 @@ LOGIN_URL = '/individual/login/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-APPEND_SLASH=False
+APPEND_SLASH=True

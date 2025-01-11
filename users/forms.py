@@ -111,3 +111,32 @@ class IndividualProfileForm(forms.ModelForm):
             'publications': forms.Textarea(attrs={'rows': 2}),
             'hobbies': forms.TextInput(attrs={'placeholder': 'e.g., Reading, Traveling'}),
         }
+
+class CompanyProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'company_name', 'phone_number', 'email', 'company_website', 'profile_picture',
+            'about_company', 'industry', 'founding_year', 'company_size', 'headquarters', 'branches'
+        ]
+        widgets = {
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'company_website': forms.URLInput(attrs={'class': 'form-control'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'about_company': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'industry': forms.TextInput(attrs={'class': 'form-control'}),
+            'founding_year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'company_size': forms.Select(choices=[
+                ('1-10', '1-10 employees'),
+                ('11-50', '11-50 employees'),
+                ('51-200', '51-200 employees'),
+                ('201-500', '201-500 employees'),
+                ('501-1000', '501-1000 employees'),
+                ('1000+', '1000+ employees'),
+            ], attrs={'class': 'form-control'}),
+            'headquarters': forms.TextInput(attrs={'class': 'form-control'}),
+            'branches': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
