@@ -24,7 +24,22 @@ class CustomUser(AbstractUser):
     founding_year = models.PositiveIntegerField(null=True, blank=True)  # Establishment Year
     headquarters = models.CharField(max_length=255, null=True, blank=True)  # Headquarters Location
     branches = models.TextField(null=True, blank=True) 
-    
+    business_registration_number = models.CharField(max_length=100, null=True, blank=True)
+    legal_structure = models.CharField(
+        max_length=50,
+        choices=[
+            ('LLP', 'LLP'),
+            ('Pvt Ltd', 'Private Limited'),
+            ('Partnership', 'Partnership'),
+            ('Sole Proprietorship', 'Sole Proprietorship'),
+            ('Others', 'Others'),
+        ],
+        null=True,
+        blank=True
+    )
+    core_services = models.TextField(null=True, blank=True)
+    social_media_links = models.JSONField(default=dict, blank=True)  # Example: {"facebook": "", "linkedin": "", "twitter": ""}
+    portfolio = models.TextField(null=True, blank=True)
     
 
     

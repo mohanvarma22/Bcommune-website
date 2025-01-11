@@ -1,4 +1,4 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,114 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Profile</title>
     <style>
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
 
         .container {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px auto;
-            background: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
 
         h1 {
-            font-size: 24px;
+            text-align: center;
             color: #333;
-            text-align: center;
-        }
-
-        h3 {
-            font-size: 20px;
-            color: #444;
-            margin-bottom: 10px;
-        }
-
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .col-md-4, .col-md-8 {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .profile-pic-container {
-            text-align: center;
-        }
-
-        .profile-pic {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 2px solid #ccc;
-            object-fit: cover;
         }
 
         .section {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f7f7f7;
-            position: relative;
-        }
-
-        .display-field {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .form-field {
-            display: none;
+            margin-bottom: 30px;
         }
 
         .button-group {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
+            margin-top: 20px;
         }
 
-        button {
-            background-color: #007bff;
-            color: white;
+        .btn-edit, .btn-cancel, .btn-save, .btn-main-save {
+            padding: 10px 20px;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
+            border-radius: 5px;
         }
 
         .btn-edit {
-            background-color: #6c757d;
+            background-color: #007bff;
+            color: white;
         }
 
         .btn-cancel {
             background-color: #dc3545;
+            color: white;
             display: none;
         }
 
         .btn-save {
             background-color: #28a745;
+            color: white;
             display: none;
         }
 
         .btn-main-save {
             background-color: #28a745;
+            color: white;
             display: none;
             margin: 20px auto;
             width: 200px;
@@ -125,6 +74,37 @@
             margin-bottom: 5px;
             display: block;
         }
+
+        .form-field {
+            display: none;
+        }
+
+        .display-field {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .profile-pic-container {
+            text-align: center;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .col-md-4, .col-md-8 {
+            flex: 1;
+        }
+
     </style>
     <script>
         let activeSection = null;
@@ -181,7 +161,7 @@
         <h1>Company Profile</h1>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            
+
             <!-- Profile Picture and Basic Info -->
             <div class="section" id="basic-info">
                 <div class="row">
@@ -231,9 +211,10 @@
             <!-- About the Company Section -->
             <div class="section" id="about-company">
                 <h3>About the Company</h3>
-                <p class="display-field">{{ user.about_company }}</p>
-                <div class="form-field">
-                    {{ form.about_company }}
+                <div>
+                    <label>Company Description:</label>
+                    <p class="display-field">{{ user.about_company }}</p>
+                    <div class="form-field">{{ form.about_company }}</div>
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('about-company')">Edit</button>
@@ -241,7 +222,7 @@
                     <button type="button" class="btn-save" onclick="saveChanges('about-company')">Save</button>
                 </div>
             </div>
-            
+
             <!-- Company Details Section -->
             <div class="section" id="company-details">
                 <h3>Company Details</h3>
@@ -276,7 +257,55 @@
                     <button type="button" class="btn-save" onclick="saveChanges('company-details')">Save</button>
                 </div>
             </div>
-            
+
+            <!-- Company Profile Section -->
+            <div class="section" id="company-profile">
+                <h3>Company Profile</h3>
+                <div>
+                    <label>Business Registration Number:</label>
+                    <p class="display-field">{{ user.business_registration_number }}</p>
+                    <div class="form-field">{{ form.business_registration_number }}</div>
+                </div>
+                <div>
+                    <label>Legal Structure:</label>
+                    <p class="display-field">{{ user.get_legal_structure_display }}</p>
+                    <div class="form-field">{{ form.legal_structure }}</div>
+                </div>
+                <div>
+                    <label>Core Services/Products:</label>
+                    <p class="display-field">{{ user.core_services }}</p>
+                    <div class="form-field">{{ form.core_services }}</div>
+                </div>
+                <div>
+                    <label>Social Media Links:</label>
+                    <p class="display-field">
+                        Facebook: {{ user.social_media_links.facebook }}<br>
+                        LinkedIn: {{ user.social_media_links.linkedin }}<br>
+                        Twitter: {{ user.social_media_links.twitter }}
+                    </p>
+                    <div class="form-field">{{ form.social_media_links }}</div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-edit" onclick="toggleEdit('company-profile')">Edit</button>
+                    <button type="button" class="btn-cancel" onclick="toggleEdit('company-profile')">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveChanges('company-profile')">Save</button>
+                </div>
+            </div>
+
+            <!-- Portfolio Section -->
+            <div class="section" id="portfolio">
+                <h3>Portfolio/Showcase</h3>
+                <p class="display-field">{{ user.portfolio }}</p>
+                <div class="form-field">
+                    {{ form.portfolio }}
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn-edit" onclick="toggleEdit('portfolio')">Edit</button>
+                    <button type="button" class="btn-cancel" onclick="toggleEdit('portfolio')">Cancel</button>
+                    <button type="button" class="btn-save" onclick="saveChanges('portfolio')">Save</button>
+                </div>
+            </div>
+
             <button type="submit" class="btn-main-save">Save All Changes</button>
         </form>
     </div>

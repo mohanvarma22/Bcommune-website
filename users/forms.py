@@ -117,7 +117,8 @@ class CompanyProfileForm(forms.ModelForm):
         model = CustomUser
         fields = [
             'company_name', 'phone_number', 'email', 'company_website', 'profile_picture',
-            'about_company', 'industry', 'founding_year', 'company_size', 'headquarters', 'branches'
+            'about_company', 'industry', 'founding_year', 'company_size', 'headquarters', 'branches',
+            'business_registration_number', 'legal_structure', 'core_services', 'social_media_links', 'portfolio'
         ]
         widgets = {
             'company_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -138,5 +139,17 @@ class CompanyProfileForm(forms.ModelForm):
             ], attrs={'class': 'form-control'}),
             'headquarters': forms.TextInput(attrs={'class': 'form-control'}),
             'branches': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            # New fields for the company profile section
+            'business_registration_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'legal_structure': forms.Select(choices=[
+                ('LLP', 'LLP'),
+                ('Pvt Ltd', 'Private Limited'),
+                ('Partnership', 'Partnership'),
+                ('Sole Proprietorship', 'Sole Proprietorship'),
+                ('Others', 'Others'),
+            ], attrs={'class': 'form-control'}),
+            'core_services': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'social_media_links': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'portfolio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
