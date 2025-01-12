@@ -200,7 +200,7 @@ def myprojects(request):
     other_company_projects = Project.objects.exclude(company=request.user).order_by('-created_at')
     
     # Get projects posted by the current company (for portfolio section)
-    my_projects = Project.objects.filter(company=request.user).order_by('-created_at')
+    my_projects = Project.objects.filter(company=request.user).prefetch_related('bids').order_by('-created_at')
     
     context = {
         'projects': other_company_projects,

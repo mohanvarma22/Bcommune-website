@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import CustomUser, IndividualProfile
+from .models import CustomUser, IndividualProfile, Bid
 
 class CompanySignupForm(UserCreationForm):
     INDUSTRY_CHOICES = [
@@ -153,8 +153,7 @@ class CompanyProfileForm(forms.ModelForm):
             'portfolio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
-from django import forms
-from .models import Bid
+
 
 class BidForm(forms.ModelForm):
     class Meta:
