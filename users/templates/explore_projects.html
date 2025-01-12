@@ -221,7 +221,7 @@
 </head>
 <body>
     {% include 'header2.html' %}
-    
+
     <!-- Main Container -->
     <div class="main-container">
         <!-- Left Sidebar -->
@@ -229,19 +229,28 @@
 
         <!-- Main Content -->
         <div class="content">
+            <!-- Alert Messages -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                         {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
+                <script>
+                    // Auto-hide alerts after 5 seconds
+                    setTimeout(() => {
+                        const alerts = document.querySelectorAll('.alert');
+                        alerts.forEach(alert => alert.classList.remove('show'));
+                    }, 5000);
+                </script>
             {% endif %}
 
-            <!-- Back button -->
+            <!-- Back Button -->
             <a href="{% url 'myprojects' %}" class="back-button">
                 ← Back to My Projects
             </a>
-            
+
             <!-- Projects Container -->
             <div class="projects-container">
                 <!-- Projects List -->
@@ -305,7 +314,9 @@
                                     {% endif %}
                                 </div>
                             </div>
-                            <button class="bid-button">Place Bid</button>
+                            {% if user.is_authenticated and user.user_type == 'company' and first_project.company != user %}
+                                <a href="{% url 'place_bid' first_project.id %}" class="btn btn-primary">Place Bid</a>
+                            {% endif %}
                         {% else %}
                             <p class="no-projects">Select a project to view details</p>
                         {% endif %}
@@ -317,190 +328,180 @@
 
     <script>
         // Function to include HTML
-        // Function to include HTML
-function includeHTML() {
-    const elements = document.querySelectorAll("[include-html]");
-    elements.forEach((element) => {
-        const file = element.getAttribute("include-html");
-        if (file) {
-            fetch(file)
-                .then((response) => {
-                    if (response.ok) return response.text();
-                    throw new Error("Page not found");
-                })
-                .then((data) => {
-                    element.innerHTML = data;
-                    element.removeAttribute("include-html");
-                    includeHTML();
-                })
-                .catch((error) => console.error(error));
+        function includeHTML() {
+            const elements = document.querySelectorAll("[include-html]");
+            elements.forEach((element) => {
+                const file = element.getAttribute("include-html");
+                if (file) {
+                    fetch(file)
+                        .then((response) => {
+                            if (response.ok) return response.text();
+                            throw new Error("Page not found");
+                        })
+                        .then((data) => {
+                            element.innerHTML = data;
+                            element.removeAttribute("include-html");
+                            includeHTML();
+                        })
+                        .catch((error) => console.error(error));
+                }
+            });
         }
-    });
-}
 
-// Function to format date
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-}
-
-// Function to format currency
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
-
-// Function to load project details
-function loadProjectDetails(projectId) {
-    const detailsContainer = document.getElementById('project-detail-content');
-    const loadingElement = document.querySelector('.loading');
-    
-    // Show loading state
-    detailsContainer.style.display = 'none';
-    loadingElement.style.display = 'flex';
-
-    // Update active state of project cards
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.classList.remove('active');
-        if (card.dataset.projectId === projectId) {
-            card.classList.add('active');
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
         }
-    });
 
-    // Update URL without reloading the page
-    const url = new URL(window.location);
-    url.searchParams.set('selected_project', projectId);
-    window.history.pushState({}, '', url);
-
-    // Fetch project details
-    fetch(`?project_id=${projectId}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+        // Function to format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
         }
-    })
-    .then(response => response.json())
-    .then(project => {
-        // Update project details content
-        detailsContainer.innerHTML = `
-            <h2>${project.title}</h2>
-            <div class="detail-section">
-                <h3>Description</h3>
-                <p>${project.description}</p>
-            </div>
-            <div class="detail-section">
-                <h3>Project Details</h3>
-                <p><strong>Type:</strong> ${project.project_type}</p>
-                <p><strong>Industry:</strong> ${project.industry}</p>
-                <p><strong>Budget:</strong> ${formatCurrency(project.budget)}</p>
-                <p><strong>Timeline:</strong> ${formatDate(project.timeline)}</p>
-                <p><strong>Location:</strong> ${project.location || 'Not specified'}</p>
-            </div>
-            <div class="detail-section">
-                <h3>Required Expertise</h3>
-                <p>${project.expertise_required}</p>
-            </div>
-            <div class="detail-section">
-                <h3>Payment Terms</h3>
-                <p>${project.payment_terms}</p>
-            </div>
-            <div class="detail-section">
-                <h3>Requirements</h3>
-                <div class="tags-section">
-                    ${project.nda_required ? '<span class="tag">NDA Required</span>' : ''}
-                    ${project.confidentiality_required ? '<span class="tag">Confidentiality Agreement</span>' : ''}
-                    ${project.ip_rights_required ? '<span class="tag">IP Rights Transfer</span>' : ''}
-                </div>
-            </div>
-            <div class="detail-section">
-                <h3>Additional Information</h3>
-                <p><strong>Posted:</strong> ${formatDate(project.created_at)}</p>
-                ${project.custom_field ? `<p><strong>Custom Field:</strong> ${project.custom_field}</p>` : ''}
-            </div>
-            <button class="bid-button" onclick="placeBid(${projectId})">Place Bid</button>
-        `;
 
-        // Hide loading state
-        loadingElement.style.display = 'none';
-        detailsContainer.style.display = 'block';
-    })
-    .catch(error => {
-        console.error('Error loading project details:', error);
-        detailsContainer.innerHTML = '<p>Error loading project details. Please try again.</p>';
-        loadingElement.style.display = 'none';
-        detailsContainer.style.display = 'block';
-    });
-}
+        // Function to load project details
+        function loadProjectDetails(projectId) {
+            const detailsContainer = document.getElementById('project-detail-content');
+            const loadingElement = document.querySelector('.loading');
+            
+            // Show loading state
+            detailsContainer.style.display = 'none';
+            loadingElement.style.display = 'flex';
 
-// Function to handle bid placement
-function placeBid(projectId) {
-    // You can customize this function based on your bidding requirements
-    alert(`Bidding functionality will be implemented for project ${projectId}`);
-}
+            // Update active state of project cards
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.projectId === projectId) {
+                    card.classList.add('active');
+                }
+            });
 
-// Function to handle scroll to active card
-function scrollToActiveCard() {
-    const activeCard = document.querySelector('.project-card.active');
-    if (activeCard) {
-        activeCard.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
-        });
-    }
-}
+            // Update URL without reloading the page
+            const url = new URL(window.location);
+            url.searchParams.set('selected_project', projectId);
+            window.history.pushState({}, '', url);
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    // Include HTML components
-    includeHTML();
+            // Fetch project details
+            fetch(`?project_id=${projectId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(project => {
+                // Update project details content
+                detailsContainer.innerHTML = `
+                    <h2>${project.title}</h2>
+                    <div class="detail-section">
+                        <h3>Description</h3>
+                        <p>${project.description}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Project Details</h3>
+                        <p><strong>Type:</strong> ${project.project_type}</p>
+                        <p><strong>Industry:</strong> ${project.industry}</p>
+                        <p><strong>Budget:</strong> ${formatCurrency(project.budget)}</p>
+                        <p><strong>Timeline:</strong> ${formatDate(project.timeline)}</p>
+                        <p><strong>Location:</strong> ${project.location || 'Not specified'}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Required Expertise</h3>
+                        <p>${project.expertise_required}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Payment Terms</h3>
+                        <p>${project.payment_terms}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h3>Requirements</h3>
+                        <div class="tags-section">
+                            ${project.nda_required ? '<span class="tag">NDA Required</span>' : ''}
+                            ${project.confidentiality_required ? '<span class="tag">Confidentiality Agreement</span>' : ''}
+                            ${project.ip_rights_required ? '<span class="tag">IP Rights Transfer</span>' : ''}
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="location.href='/project/${projectId}/bid/'">Place Bid</button>
+                `;
 
-    // Add click event listeners to project cards
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('click', function() {
-            loadProjectDetails(this.dataset.projectId);
-        });
-    });
+                // Hide loading state
+                loadingElement.style.display = 'none';
+                detailsContainer.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading project details:', error);
+                detailsContainer.innerHTML = '<p>Error loading project details. Please try again.</p>';
+                loadingElement.style.display = 'none';
+                detailsContainer.style.display = 'block';
+            });
+        }
 
-    // Get selected project ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedProjectId = urlParams.get('selected_project');
-
-    // If there's a selected project, load its details
-    if (selectedProjectId) {
-        loadProjectDetails(selectedProjectId);
-        
-        // Wait for HTML inclusion to complete before scrolling
-        setTimeout(() => {
-            scrollToActiveCard();
-        }, 500);
-    }
-
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', function(event) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('selected_project');
-        if (projectId) {
-            loadProjectDetails(projectId);
-        } else {
-            // If no project is selected, load the first project
-            const firstCard = document.querySelector('.project-card');
-            if (firstCard) {
-                loadProjectDetails(firstCard.dataset.projectId);
+        // Function to handle scroll to active card
+        function scrollToActiveCard() {
+            const activeCard = document.querySelector('.project-card.active');
+            if (activeCard) {
+                activeCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             }
         }
-    });
 
-    // Handle errors with project loading
-    window.addEventListener('error', function(event) {
-        const detailsContainer = document.getElementById('project-detail-content');
-        detailsContainer.innerHTML = '<p>An error occurred while loading the project. Please try again.</p>';
-        console.error('Error:', event.error);
-    });
-});
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Include HTML components
+            includeHTML();
 
-</script>
+            // Add click event listeners to project cards
+            document.querySelectorAll('.project-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    loadProjectDetails(this.dataset.projectId);
+                });
+            });
+
+            // Get selected project ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedProjectId = urlParams.get('selected_project');
+
+            // If there's a selected project, load its details
+            if (selectedProjectId) {
+                loadProjectDetails(selectedProjectId);
+                
+                // Wait for HTML inclusion to complete before scrolling
+                setTimeout(() => {
+                    scrollToActiveCard();
+                }, 1000);
+            }
+
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function(event) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const projectId = urlParams.get('selected_project');
+                if (projectId) {
+                    loadProjectDetails(projectId);
+                } else {
+                    // If no project is selected, load the first project
+                    const firstCard = document.querySelector('.project-card');
+                    if (firstCard) {
+                        loadProjectDetails(firstCard.dataset.projectId);
+                    }
+                }
+            });
+
+            // Handle errors with project loading
+            window.addEventListener('error', function(event) {
+                const detailsContainer = document.getElementById('project-detail-content');
+                detailsContainer.innerHTML = '<p>An error occurred while loading the project. Please try again.</p>';
+            });
+        });
+
+        // Smooth scroll to the active card on page load
+        scrollToActiveCard();
+    </script>
+</body>

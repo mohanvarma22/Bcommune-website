@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 
@@ -312,39 +312,45 @@ def delete_job(request, job_id):
     return JsonResponse({'status': 'error'}, status=400)
 
 
+
+
 @login_required
 def explore_projects(request):
+    # Fetch projects excluding those belonging to the logged-in company
     other_company_projects = Project.objects.exclude(company=request.user).order_by('-created_at')
     
     # Handle AJAX request for project details
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         project_id = request.GET.get('project_id')
-        try:
-            project = Project.objects.get(id=project_id)
-            data = {
-                'title': project.title,
-                'description': project.description,
-                'project_type': project.project_type,
-                'industry': project.industry,
-                'budget': float(project.budget),
-                'timeline': project.timeline.strftime('%Y-%m-%d'),
-                'location': project.location or 'Not specified',
-                'expertise_required': project.expertise_required,
-                'payment_terms': project.payment_terms,
-                'nda_required': project.nda_required,
-                'confidentiality_required': project.confidentiality_required,
-                'ip_rights_required': project.ip_rights_required,
-                'custom_field': project.custom_field,
-                'created_at': project.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            }
-            return JsonResponse(data)
-        except Project.DoesNotExist:
-            return JsonResponse({'error': 'Project not found'}, status=404)
+        if project_id:
+            try:
+                project = Project.objects.get(id=project_id)
+                data = {
+                    'title': project.title,
+                    'description': project.description,
+                    'project_type': project.project_type,
+                    'industry': project.industry,
+                    'budget': float(project.budget),
+                    'timeline': project.timeline.strftime('%Y-%m-%d'),
+                    'location': project.location or 'Not specified',
+                    'expertise_required': project.expertise_required,
+                    'payment_terms': project.payment_terms,
+                    'nda_required': project.nda_required,
+                    'confidentiality_required': project.confidentiality_required,
+                    'ip_rights_required': project.ip_rights_required,
+                    'custom_field': getattr(project, 'custom_field', None),  # Safely handle custom_field
+                    'created_at': project.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }
+                return JsonResponse(data)
+            except Project.DoesNotExist:
+                return JsonResponse({'error': 'Project not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Invalid project ID'}, status=400)
 
     # Get selected project ID from URL parameter
     selected_project_id = request.GET.get('selected_project')
-    
-    # Get the first project for initial display
+
+    # Determine the project to display first
     first_project = None
     if selected_project_id:
         try:
@@ -354,10 +360,11 @@ def explore_projects(request):
     else:
         first_project = other_company_projects.first()
     
+    # Context for rendering the template
     context = {
         'projects': other_company_projects,
         'first_project': first_project,
-        'selected_project_id': selected_project_id
+        'selected_project_id': selected_project_id,
     }
     return render(request, 'explore_projects.html', context)
 
@@ -403,3 +410,39 @@ def company_profile(request):
 @login_required
 def faq(request):
     return render(request,'faq.html')
+
+@login_required
+def place_bid(request, project_id):
+    # Check if user is a company
+    if request.user.user_type != 'company':
+        messages.error(request, "Only companies can place bids!")
+        return redirect('explore_projects')  # Redirect to explore_projects
+    
+    project = get_object_or_404(Project, id=project_id)
+    
+    # Prevent project owner from bidding on their own project
+    if project.company == request.user:
+        messages.error(request, "You cannot bid on your own project!")
+        return redirect('explore_projects')  # Redirect to explore_projects
+    
+    # Check if user already has a bid
+    existing_bid = Bid.objects.filter(project=project, bidder=request.user).first()
+    
+    if request.method == 'POST':
+        form = BidForm(request.POST, instance=existing_bid)
+        if form.is_valid():
+            bid = form.save(commit=False)
+            bid.project = project
+            bid.bidder = request.user
+            bid.save()
+            messages.success(request, 'Your bid has been placed successfully!')
+            return redirect('explore_projects')  # Redirect to explore_projects
+    else:
+        form = BidForm(instance=existing_bid)
+    
+    context = {
+        'form': form,
+        'project': project,
+        'existing_bid': existing_bid
+    }
+    return render(request, 'bidform.html', context)

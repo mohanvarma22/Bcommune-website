@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bid for a Project</title>
+    <link rel="stylesheet" href="/Static/css/individualmyjobs.css">
+    <link rel="stylesheet" href="/Static/css/homepage.css">
+    <style>
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .optional {
+            font-style: italic;
+            color: #888;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .file-input {
+            margin-top: 10px;
+        }
+
+        .alert {
+            padding: 15px;
+            background-color: #f44336;
+            color: white;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .alert.success {
+            background-color: #4caf50;
+        }
+
+        .alert.warning {
+            background-color: #ff9800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% if messages %}
+        <div id="alerts">
+            {% for message in messages %}
+            <div class="alert {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h1>Submit Your Bid</h1>
+        <form action="{% url 'place_bid' project.id %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="button-group">
+                <button type="submit" class="btn">Submit Bid</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.getElementById('alerts');
+            if (alerts) alerts.style.display = 'none';
+        }, 5000);
+    </script>
+</body>
+</html>

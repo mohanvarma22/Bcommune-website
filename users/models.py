@@ -142,3 +142,19 @@ class IndividualProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+    
+class Bid(models.Model):
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='bids')
+    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
+                              limit_choices_to={'user_type': 'company'})  # Only companies can bid
+    amount = models.DecimalField(max_digits=15, decimal_places=2)
+    proposal = models.TextField()
+    estimated_timeline = models.IntegerField(help_text="Estimated days to complete")
+    additional_details = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['project', 'bidder']
+        
+    def __str__(self):
+        return f"Bid by {self.bidder.company_name} on {self.project}"

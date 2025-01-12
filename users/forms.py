@@ -153,3 +153,16 @@ class CompanyProfileForm(forms.ModelForm):
             'portfolio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
+from django import forms
+from .models import Bid
+
+class BidForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ['amount', 'proposal', 'estimated_timeline', 'additional_details']
+        widgets = {
+            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'proposal': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'estimated_timeline': forms.NumberInput(attrs={'class': 'form-control'}),
+            'additional_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
