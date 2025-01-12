@@ -1,6 +1,12 @@
+{%load static%}
+
 <div class="sidebar">
-    <img src="/images/googleorg.webp" alt="User Photo" class="profile-pic">
-    <h2>GOOGLE</h2>
+  {% if user.profile_picture %}
+  <img src="{% static 'images/default-profile.png' %}" alt="Profile Picture" class="profile-pic">
+  {% else %}
+  <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture" class="profile-pic">
+  {% endif %}
+    <h2>{{ user.company_name }}</h2>
     <br><br>
 
     <h4>

@@ -7,7 +7,7 @@
 }
 
 body {
-    background-color: #1a2746;
+    background-color: #1a2734;
     color: #333;
     font-family: Arial, sans-serif;
     min-height: 100vh;
@@ -18,7 +18,7 @@ body {
 
 /* Header */
 header {
-    background-color: #0a2746;
+    background-color: #1a2734;
     padding: 15px 5%;
     color: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);

@@ -82,7 +82,7 @@ class Project(models.Model):
     description = models.TextField()
     project_type = models.CharField(max_length=100)
     industry = models.CharField(max_length=100)
-    budget = models.DecimalField(max_digits=10, decimal_places=2)
+    budget = models.DecimalField(max_digits=15, decimal_places=2)
     timeline = models.DateField()
     location = models.CharField(max_length=200, blank=True, null=True)
     expertise_required = models.TextField()

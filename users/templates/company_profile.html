@@ -63,9 +63,10 @@
         .btn-main-save {
             background-color: #28a745;
             color: white;
-            display: none;
+            display: block; /* Make it visible by default */
             margin: 20px auto;
             width: 200px;
+            text-align: center;
         }
 
         label {
@@ -104,7 +105,6 @@
         .col-md-4, .col-md-8 {
             flex: 1;
         }
-
     </style>
     <script>
         let activeSection = null;
@@ -118,7 +118,6 @@
             const saveButton = section.querySelector('.btn-save');
             const mainSaveButton = document.querySelector('.btn-main-save');
 
-            // If this section is already being edited, cancel the edit
             if (activeSection === sectionId) {
                 displayFields.forEach(field => field.style.display = 'block');
                 formFields.forEach(field => field.style.display = 'none');
@@ -127,19 +126,11 @@
                 saveButton.style.display = 'none';
                 mainSaveButton.style.display = 'none';
                 activeSection = null;
-            } 
-            // If a different section is being edited, cancel that edit first
-            else {
+            } else {
                 if (activeSection) {
-                    const previousSection = document.getElementById(activeSection);
-                    previousSection.querySelectorAll('.display-field').forEach(field => field.style.display = 'block');
-                    previousSection.querySelectorAll('.form-field').forEach(field => field.style.display = 'none');
-                    previousSection.querySelector('.btn-edit').style.display = 'block';
-                    previousSection.querySelector('.btn-cancel').style.display = 'none';
-                    previousSection.querySelector('.btn-save').style.display = 'none';
+                    saveChanges(activeSection);
                 }
 
-                // Start editing this section
                 displayFields.forEach(field => field.style.display = 'none');
                 formFields.forEach(field => field.style.display = 'block');
                 editButton.style.display = 'none';
@@ -147,12 +138,38 @@
                 saveButton.style.display = 'block';
                 mainSaveButton.style.display = 'block';
                 activeSection = sectionId;
+
+                document.addEventListener('click', handleOutsideClick);
             }
         }
 
         function saveChanges(sectionId) {
-            // Add your save logic here
-            toggleEdit(sectionId); // This will reset the view
+            const section = document.getElementById(sectionId);
+            const formFields = section.querySelectorAll('.form-field');
+            const displayFields = section.querySelectorAll('.display-field');
+
+            formFields.forEach((formField, index) => {
+                const input = formField.querySelector('input, select, textarea');
+                if (input) {
+                    const updatedValue = input.value;
+                    const displayField = displayFields[index];
+                    if (displayField) {
+                        displayField.textContent = updatedValue;
+                    }
+                }
+            });
+
+            console.log("Changes saved for section:", sectionId);
+            toggleEdit(sectionId);
+        }
+
+        function handleOutsideClick(event) {
+            const activeSectionElement = document.getElementById(activeSection);
+            if (activeSectionElement && !activeSectionElement.contains(event.target)) {
+                saveChanges(activeSection);
+                activeSection = null;
+                document.removeEventListener('click', handleOutsideClick);
+            }
         }
     </script>
 </head>
@@ -161,8 +178,6 @@
         <h1>Company Profile</h1>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-
-            <!-- Profile Picture and Basic Info -->
             <div class="section" id="basic-info">
                 <div class="row">
                     <div class="col-md-4">
@@ -203,10 +218,9 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('basic-info')">Edit</button>
-                    <button type="button" class="btn-cancel" onclick="toggleEdit('basic-info')">Cancel</button>
-                    <button type="button" class="btn-save" onclick="saveChanges('basic-info')">Save</button>
                 </div>
             </div>
+            <!-- Add other sections similarly -->
 
             <!-- About the Company Section -->
             <div class="section" id="about-company">
@@ -218,8 +232,6 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('about-company')">Edit</button>
-                    <button type="button" class="btn-cancel" onclick="toggleEdit('about-company')">Cancel</button>
-                    <button type="button" class="btn-save" onclick="saveChanges('about-company')">Save</button>
                 </div>
             </div>
 
@@ -253,8 +265,6 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('company-details')">Edit</button>
-                    <button type="button" class="btn-cancel" onclick="toggleEdit('company-details')">Cancel</button>
-                    <button type="button" class="btn-save" onclick="saveChanges('company-details')">Save</button>
                 </div>
             </div>
 
@@ -287,8 +297,6 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('company-profile')">Edit</button>
-                    <button type="button" class="btn-cancel" onclick="toggleEdit('company-profile')">Cancel</button>
-                    <button type="button" class="btn-save" onclick="saveChanges('company-profile')">Save</button>
                 </div>
             </div>
 
@@ -301,8 +309,6 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn-edit" onclick="toggleEdit('portfolio')">Edit</button>
-                    <button type="button" class="btn-cancel" onclick="toggleEdit('portfolio')">Cancel</button>
-                    <button type="button" class="btn-save" onclick="saveChanges('portfolio')">Save</button>
                 </div>
             </div>
 

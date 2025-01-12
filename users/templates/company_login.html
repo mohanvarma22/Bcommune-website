@@ -275,6 +275,11 @@
             {% endif %}
             <p>Don't have an account? <a href="{% url 'company_signup' %}">Signup</a></p>
             </form>
+            {% if messages %}
+            {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
 
