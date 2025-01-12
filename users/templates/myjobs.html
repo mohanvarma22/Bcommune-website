@@ -35,7 +35,7 @@
                                         <p class="company">{{ job.company }}</p>
                                     </div>
                                     <!-- Provide a valid path to the image -->
-                                    <img src="{{ job.logo_url }}" alt="{{ job.company }} Logo" class="header-image">
+                                    <img src="{% static 'images/B.png' %}" alt="{{ job.company }} Logo" class="header-image" style="border-radius: 50%;">
                                 </div>
                                 <div class="card-body">
                                     <p class="location">📍 {{ job.location }}</p>

@@ -1,16 +1,24 @@
-{%load static%}
+{% load static %}
 
 <div class="sidebar">
-    <img src="{% static 'images/em..jpg' %}" alt="User Photo" class="profile-pic">
-    <h2>Preetham Sagar</h2>
-    <p>Graduate from VMEG</p>
+    <div class="profile-section">
+        {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" alt="User Photo" class="profile-pic">
+        {% else %}
+        <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture" class="profile-pic">
+        {% endif %}
+        <h2>{{ user.get_full_name }}</h2>
+
+    </div>
     <br><br>
 
     <h4>Trending Skills</h4>
     <ul>
-        <li>#Data Structures</li>
-        <li>#Data Analysis</li>
-        <li>#Java Programming</li>
+        {% for skill in user.trending_skills.all %}
+        <li>#{{ skill }}</li>
+        {% empty %}
+        <li>No skills to display</li>
+        {% endfor %}
     </ul>
     <br>
 

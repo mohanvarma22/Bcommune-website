@@ -250,7 +250,7 @@
                         {% for project in projects %}
                             <div class="project-card {% if project.id|stringformat:'s' == selected_project_id %}active{% elif not selected_project_id and forloop.first %}active{% endif %}" data-project-id="{{ project.id }}">
                                 <div class="bid-logo">
-                                    <img src="{% static 'images/default-project.png' %}" alt="Project Logo">
+                                    <img src="{% static 'images/B.png' %}" alt="Project Logo">
                                 </div>
                                 <h3>{{ project.title }}</h3>
                                 <p>{{ project.description|truncatechars:100 }}</p>

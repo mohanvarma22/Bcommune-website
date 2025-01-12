@@ -2,11 +2,11 @@
 
 <div class="sidebar">
   {% if user.profile_picture %}
-  <img src="{% static 'images/default-profile.png' %}" alt="Profile Picture" class="profile-pic">
+  <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
   {% else %}
-  <img src="{% static 'images/default-profile.png' %}" alt="Default Profile Picture" class="profile-pic">
+  <img src="{{ user.profile_picture.url }}" alt="Default Profile Picture" class="profile-pic">
   {% endif %}
-    <h2>{{ user.company_name }}</h2>
+    <a href="{% url 'company_profile' %}" style=" text-decoration: none;" ><h2>{{ user.company_name }}</h2></a>
     <br><br>
 
     <h4>
@@ -47,6 +47,6 @@
     </h4>
 
     <h4>
-      <a href="faq1.html" style="text-decoration: none; color: inherit;">FAQ's</a>
+      <a href="{% url 'faq' %}" style="text-decoration: none; color: inherit;">FAQ's</a>
     </h4>
 </div>

@@ -399,3 +399,7 @@ def company_profile(request):
         form = CompanyProfileForm(instance=user)
 
     return render(request, 'company_profile.html', {'form': form, 'user': user})
+
+@login_required
+def faq(request):
+    return render(request,'faq.html')

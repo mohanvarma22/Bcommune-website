@@ -49,7 +49,7 @@ header {
 .main-container {
     display: flex;
     flex-direction: column;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 20px auto;
     background-color: #1a2734;
     border-radius: 8px;
@@ -131,20 +131,6 @@ header {
     text-decoration: underline;
 }
 
-/* Responsive Media Queries */
-@media (min-width: 600px) {
-    .main-container {
-        flex-direction: row;
-    }
-
-    .sidebar {
-        width: 25%;
-    }
-
-    .content {
-        width: 75%;
-    }
-}
 
 @media (min-width: 900px) {
     .navbar nav {

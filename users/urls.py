@@ -31,7 +31,7 @@ urlpatterns = [
     path('individual/profile/edit', views.edit_individual_profile, name='edit_individual_profile'),
     path('individual/profile/', views.individual_profile, name='individual_profile'),
     path('company/dashboard/profile/', views.company_profile, name='company_profile'),
-
+    path('faq',views.faq,name='faq'),
 ]
 
 if settings.DEBUG:
