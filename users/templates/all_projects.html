@@ -97,6 +97,46 @@
             margin: 2px;
             font-size: 14px;
         }
+        .view-bids-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-bids-btn:hover {
+    background-color: #0056b3;
+}
+
+.bid-card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.bid-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bid-card.selected {
+    background-color: #f0f7ff;
+    border-left: 4px solid #007bff;
+}
+
+.bid-details {
+    display: none;
+}
+
+.bid-details.active {
+    display: block;
+}
     </style>
 </head>
 <body>
@@ -167,7 +207,15 @@
                     <div class="detail-section">
                         <p>Posted on: {{ project.created_at|date:"M d, Y" }}</p>
                     </div>
+                    <button 
+            onclick="toggleBids('{{ project.id }}')"
+            class="view-bids-btn"
+            id="toggle-btn-{{ project.id }}"
+        >
+            View Bids
+        </button>
                 </div>
+
             {% endfor %}
         </div>
     </div>

@@ -87,7 +87,7 @@
            </div>
            
            <button type="submit">Update Job</button>
-           <a href="{% url 'myjobs' %}" style="margin-left: 10px; text-decoration: none;">Cancel</a>
+           <a href="{% url 'all_jobs' %}" style="margin-left: 10px; text-decoration: none;">Cancel</a>
        </form>
    </div>
 </div>
@@ -107,7 +107,7 @@
        .then(response => response.json())
        .then(data => {
            if(data.status === 'success') {
-               window.location.href = '/company/dashboard/myjobs/';
+               window.location.href = '/company/dashboard/myportfolio/all_jobs/';
            } else {
                alert(data.message);
            }

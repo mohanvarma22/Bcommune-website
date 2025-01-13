@@ -7,6 +7,7 @@ from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 def logout_view(request):
     logout(request)
@@ -304,12 +305,15 @@ def edit_job(request, job_id):
     
     return render(request, 'edit_job.html', {'job': job})
 
+@login_required
+@require_http_methods(["POST"])
 def delete_job(request, job_id):
-    job = get_object_or_404(Job, id=job_id, company_user=request.user)
-    if request.method == 'POST':
+    try:
+        job = get_object_or_404(Job, id=job_id, company_user=request.user)
         job.delete()
         return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
 
@@ -494,3 +498,4 @@ def all_ideas(request):
         'ideas': ideas,
         'selected_idea_id': selected_idea_id
     })
+
