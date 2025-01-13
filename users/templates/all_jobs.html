@@ -1,0 +1,161 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Jobs</title>
+</head>
+<body>
+    <h1>All Jobs</h1>
+</body>
+    <style>
+        .container {
+            display: flex;
+            margin: 20px;
+            gap: 20px;
+        }
+
+        .left-container {
+            flex: 1;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .right-container {
+            flex: 2;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .job-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .job-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .job-company {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .job-location {
+            color: #007bff;
+            font-size: 14px;
+        }
+
+        .job-details {
+            display: none;
+        }
+
+        .job-details.active {
+            display: block;
+        }
+
+        .detail-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <div class="container">
+        <div class="left-container">
+            {% for job in jobs %}
+                <div class="job-card" onclick="showJobDetails({{ job.id }})">
+                    <div class="job-title">{{ job.title }}</div>
+                    <div class="job-company">{{ job.company }}</div>
+                    <div class="job-location">📍 {{ job.location }}</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="right-container">
+            {% for job in jobs %}
+                <div id="job-details-{{ job.id }}" class="job-details">
+                    <div class="detail-header">
+                        <h2>{{ job.title }}</h2>
+                        <p>{{ job.company }}</p>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>Location</h3>
+                        <p>📍 {{ job.location }}</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Salary</h3>
+                        <p>💰 {{ job.salary }}</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Requirements</h3>
+                        <p>{{ job.requirements }}</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Description</h3>
+                        <p>{{ job.description }}</p>
+                    </div>
+
+                    <div class="detail-section">
+                        <p>Posted on: {{ job.posted_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function showJobDetails(jobId) {
+            // Hide all job details first
+            document.querySelectorAll('.job-details').forEach(detail => {
+                detail.classList.remove('active');
+            });
+            
+            // Show the selected job details
+            const selectedJob = document.getElementById(`job-details-${jobId}`);
+            if (selectedJob) {
+                selectedJob.classList.add('active');
+            }
+        }
+
+        // Show first job details by default if exists
+        window.onload = function() {
+            const firstJob = document.querySelector('.job-details');
+            if (firstJob) {
+                firstJob.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

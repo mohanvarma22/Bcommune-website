@@ -3,7 +3,9 @@
 <header>
     <div class="navbar">
         <div class="logo">
-            <img src="{% static 'images/Bcommune_logo.png' %}" alt="Bcommune Logo">
+            <a href="{% url 'individual_dashboard' %}">
+                <img src="{% static 'images/Bcommune_logo.png' %}" alt="Bcommune Logo">
+            </a>
         </div>
         <div class="search-bar">
             <input type="text" placeholder="   Search for jobs, skills, etc." />

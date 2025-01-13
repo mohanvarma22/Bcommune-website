@@ -446,3 +446,14 @@ def place_bid(request, project_id):
         'existing_bid': existing_bid
     }
     return render(request, 'bidform.html', context)
+
+def myportfolio(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    
+    # Fetch all jobs for the currently logged-in company user
+    recent_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
+    return render(request, 'myportfolio.html', {'jobs': recent_jobs})
+
+def all_jobs(request):
+    return render(request, 'all_jobs.html')
