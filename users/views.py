@@ -453,7 +453,31 @@ def myportfolio(request):
     
     # Fetch all jobs for the currently logged-in company user
     recent_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
-    return render(request, 'myportfolio.html', {'jobs': recent_jobs})
+    recent_projects = Project.objects.filter(company=request.user).order_by('-created_at')[:3]
+    return render(request, 'myportfolio.html', {'jobs': recent_jobs,'projects': recent_projects})
 
 def all_jobs(request):
-    return render(request, 'all_jobs.html')
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    jobs = Job.objects.filter(company_user=request.user)
+    
+    # Get the job_id from URL parameters
+    selected_job_id = request.GET.get('job_id')
+    
+    return render(request, 'all_jobs.html', {
+        'jobs': jobs,
+        'selected_job_id': selected_job_id
+    })
+
+def all_projects(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    
+    projects = Project.objects.filter(company=request.user).order_by('-created_at')
+    selected_project_id = request.GET.get('project_id')
+    
+    return render(request, 'all_projects.html', {
+        'projects': projects,
+        'selected_project_id': selected_project_id
+    })

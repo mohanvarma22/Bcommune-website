@@ -35,6 +35,7 @@ urlpatterns = [
     path('project/<int:project_id>/bid/', views.place_bid, name='place_bid'),
     path('company/dashboard/myportfolio/', views.myportfolio, name='myportfolio'),
     path('company/dashboard/myportfolio/all_jobs/', views.all_jobs, name='all_jobs'),
+    path('company/dashboard/mrportfolio/all-projects/', views.all_projects, name='all_projects'),
 ]
 
 if settings.DEBUG:

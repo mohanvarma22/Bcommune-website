@@ -11,116 +11,116 @@
 <body>
 
     <style>
-        /* common.css */
-
-/* Job Cards Container */
-.job-cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-/* Job Card */
-.job-card {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.job-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Card Header */
-.card-header {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: #1a2734;
-    border-bottom: 1px solid #eee;
-}
-
-.card-header .header-content {
-    flex: 1;
-}
-
-.card-header h3 {
-    margin: 0;
-    font-size: 18px;
-    color: white;
-}
-
-.card-header .company {
-    margin: 5px 0 0;
-    font-size: 14px;
-    color: white;
-}
-
-.card-header .header-image {
-    width: 50px;
-    height: 50px;
-}
-
-/* Card Body */
-.card-body {
-    padding: 15px;
-}
-
-.card-body p {
-    margin: 10px 0;
-    color: #555;
-    font-size: 14px;
-}
-
-.location {
-    font-weight: bold;
-    color: #007bff;
-}
-
-.salary {
-    font-weight: bold;
-    color: #28a745;
-}
-
-/* Requirements Section */
-.requirements {
-    margin-top: 15px;
-}
-
-.requirements h4 {
-    margin: 0 0 5px;
-    font-size: 16px;
-    color: #444;
-}
-
-.requirements p {
-    font-size: 14px;
-    color: #666;
-    line-height: 1.6;
-}
-
-/* Posted Date */
-.posted-date {
-    padding: 15px;
-    font-size: 12px;
-    color: #999;
-    background-color: #f9f9f9;
-    text-align: right;
-    border-top: 1px solid #eee;
-}
-
-/* No Jobs Message */
-.no-jobs {
-    text-align: center;
-    color: #888;
-    font-size: 16px;
-    margin: 20px 0;
-}
-
-    </style>
+        /* Job and Project Cards Container */
+        .job-cards-container, .project-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Common Card Styles for Job and Project Cards */
+        .job-card, .project-card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .job-card:hover, .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Common Card Header */
+        .card-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #1a2734;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header .header-content {
+            flex: 1;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-size: 18px;
+            color: white;
+        }
+        
+        .card-header .company {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .card-header .header-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        
+        /* Common Card Body */
+        .card-body {
+            padding: 15px;
+        }
+        
+        .card-body p {
+            margin: 10px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .location {
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .salary {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        /* Requirements or Description Section */
+        .requirements, .description {
+            margin-top: 15px;
+        }
+        
+        .requirements h4, .description h4 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            color: #444;
+        }
+        
+        .requirements p, .description p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Posted Date */
+        .posted-date {
+            padding: 15px;
+            font-size: 12px;
+            color: #999;
+            background-color: #f9f9f9;
+            text-align: right;
+            border-top: 1px solid #eee;
+        }
+        
+        /* No Content Message */
+        .no-jobs, .no-projects {
+            text-align: center;
+            color: #888;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        </style>
+        
+   
 
     {% include 'header2.html' %}
     
@@ -132,10 +132,11 @@
         <!-- Main Content -->
         <div class="content">
             <section class="portfolio-jobs">
-                <a href="{% url 'all_jobs' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"> Jobs Posted</h2></a>
+                <a href="{% url 'all_jobs' %}?job_id={{ job.id }}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"> Jobs Posted</h2></a>
                 <div class="job-cards-container">
                     {% if jobs %}
                         {% for job in jobs %}
+                        <a href="{% url 'all_jobs' %}?job_id={{ job.id }}" style="text-decoration: none; color: inherit;">
                             <div class="job-card">
                                 <div class="card-header">
                                     <div class="header-content">
@@ -160,6 +161,38 @@
                     {% endif %}
                 </div>
             </section>
+            <!-- Projects Section -->
+<section class="portfolio-projects">
+    <a href="{% url 'all_projects' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Projects Posted </h2></a>
+    <div class="project-cards-container">
+        {% if projects %}
+            {% for project in projects %}
+                <a href="{% url 'all_projects' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
+                    <div class="job-card">  <!-- Using job-card class for consistent styling -->
+                        <div class="card-header">
+                            <div class="header-content">
+                                <h3>{{ project.title }}</h3>
+                                <p class="company">{{ project.project_type }}</p>
+                            </div>
+                            <img src="{% static 'images/B.png' %}" alt="Project Logo" class="header-image" style="border-radius: 50%;">
+                        </div>
+                        <div class="card-body">
+                            <p class="location">📍 {{ project.location|default:"Remote" }}</p>
+                            <p class="salary">💰 ${{ project.budget }}</p>
+                            <div class="requirements">
+                                <h4>Description:</h4>
+                                <p>{{ project.description|truncatechars:100 }}</p>
+                            </div>
+                        </div>
+                        <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p class="no-jobs">No projects available in the portfolio.</p>
+        {% endif %}
+    </div>
+</section>
         </div>
     </div>
 
