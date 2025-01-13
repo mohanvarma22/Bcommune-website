@@ -36,6 +36,7 @@ urlpatterns = [
     path('company/dashboard/myportfolio/', views.myportfolio, name='myportfolio'),
     path('company/dashboard/myportfolio/all_jobs/', views.all_jobs, name='all_jobs'),
     path('company/dashboard/mrportfolio/all-projects/', views.all_projects, name='all_projects'),
+    path('company/dashboard/mrportfolio/all-ideas/', views.all_ideas, name='all_ideas'),
 ]
 
 if settings.DEBUG:

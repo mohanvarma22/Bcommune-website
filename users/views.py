@@ -454,7 +454,8 @@ def myportfolio(request):
     # Fetch all jobs for the currently logged-in company user
     recent_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
     recent_projects = Project.objects.filter(company=request.user).order_by('-created_at')[:3]
-    return render(request, 'myportfolio.html', {'jobs': recent_jobs,'projects': recent_projects})
+    recent_ideas = Idea.objects.all().order_by('-created_at')[:3]
+    return render(request, 'myportfolio.html', {'jobs': recent_jobs,'projects': recent_projects,'ideas': recent_ideas})
 
 def all_jobs(request):
     if not request.user.is_authenticated:
@@ -480,4 +481,16 @@ def all_projects(request):
     return render(request, 'all_projects.html', {
         'projects': projects,
         'selected_project_id': selected_project_id
+    })
+
+def all_ideas(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    
+    ideas = Idea.objects.all().order_by('-created_at')
+    selected_idea_id = request.GET.get('idea_id')
+    
+    return render(request, 'all_ideas.html', {
+        'ideas': ideas,
+        'selected_idea_id': selected_idea_id
     })

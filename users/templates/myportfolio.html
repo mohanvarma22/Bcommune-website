@@ -12,26 +12,28 @@
 
     <style>
         /* Job and Project Cards Container */
-        .job-cards-container, .project-cards-container {
+        
+        .job-cards-container, .project-cards-container, .idea-cards-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
+            padding: 20px;
         }
-        
-        /* Common Card Styles for Job and Project Cards */
-        .job-card, .project-card {
+
+        /* Common Card Styles */
+        .job-card, .project-card, .idea-card {
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .job-card:hover, .project-card:hover {
+
+        .job-card:hover, .project-card:hover, .idea-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
-        
+
         /* Common Card Header */
         .card-header {
             display: flex;
@@ -40,67 +42,74 @@
             background-color: #1a2734;
             border-bottom: 1px solid #eee;
         }
-        
+
         .card-header .header-content {
             flex: 1;
         }
-        
+
         .card-header h3 {
             margin: 0;
             font-size: 18px;
             color: white;
         }
-        
+
         .card-header .company {
             margin: 5px 0 0;
             font-size: 14px;
             color: white;
         }
-        
+
         .card-header .header-image {
             width: 50px;
             height: 50px;
             border-radius: 50%;
+            object-fit: cover;
         }
-        
+
         /* Common Card Body */
         .card-body {
             padding: 15px;
         }
-        
+
         .card-body p {
             margin: 10px 0;
             color: #555;
             font-size: 14px;
         }
-        
-        .location {
+
+        .location, .visibility {
             font-weight: bold;
             color: #007bff;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        
-        .salary {
+
+        .salary, .funding {
             font-weight: bold;
             color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        
+
         /* Requirements or Description Section */
         .requirements, .description {
             margin-top: 15px;
         }
-        
+
         .requirements h4, .description h4 {
             margin: 0 0 5px;
             font-size: 16px;
             color: #444;
         }
-        
+
         .requirements p, .description p {
             font-size: 14px;
             color: #666;
             line-height: 1.6;
         }
-        
+
         /* Posted Date */
         .posted-date {
             padding: 15px;
@@ -110,16 +119,61 @@
             text-align: right;
             border-top: 1px solid #eee;
         }
-        
+
         /* No Content Message */
-        .no-jobs, .no-projects {
+        .no-jobs, .no-projects, .no-ideas {
             text-align: center;
             color: #888;
             font-size: 16px;
             margin: 20px 0;
         }
+
+        /* Section Headers */
+        .portfolio-jobs h2, .portfolio-projects h2, .portfolio-ideas h2 {
+            padding: 2%;
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            color: #1a2734;
+            margin-bottom: 0;
+        }
+
+        /* Card Links */
+        a[style*="text-decoration: none"] {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        /* Main Container Layout */
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .job-cards-container, .project-cards-container, .idea-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .card-header .header-image {
+                margin-top: 10px;
+            }
+        }
+
         </style>
-        
    
 
     {% include 'header2.html' %}
@@ -190,6 +244,43 @@
             {% endfor %}
         {% else %}
             <p class="no-jobs">No projects available in the portfolio.</p>
+        {% endif %}
+    </div>
+</section>
+<section class="portfolio-ideas">
+    <a href="{% url 'all_ideas' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">All Posted Ideas</h2></a>
+    <div class="idea-cards-container">
+        {% if ideas %}
+            {% for idea in ideas %}
+                <a href="{% url 'all_ideas' %}?idea_id={{ idea.id }}" style="text-decoration: none; color: inherit;">
+                    <div class="job-card">
+                        <div class="card-header">
+                            <div class="header-content">
+                                <h3>{{ idea.title }}</h3>
+                                <p class="company">{{ idea.category }}</p>
+                            </div>
+                            {% if idea.photo %}
+                                <img src="{{ idea.photo.url }}" alt="Idea Image" class="header-image" style="border-radius: 50%;">
+                            {% else %}
+                                <img src="{% static 'images/B.png' %}" alt="Default Image" class="header-image" style="border-radius: 50%;">
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <p class="visibility">🔒 {{ idea.visibility|title }}</p>
+                            {% if idea.fund %}
+                                <p class="funding">💰 ${{ idea.fund }}</p>
+                            {% endif %}
+                            <div class="requirements">
+                                <h4>Description:</h4>
+                                <p>{{ idea.brief_description|truncatechars:100 }}</p>
+                            </div>
+                        </div>
+                        <p class="posted-date">Posted: {{ idea.created_at|date:"M d, Y" }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p class="no-ideas">No ideas available.</p>
         {% endif %}
     </div>
 </section>
