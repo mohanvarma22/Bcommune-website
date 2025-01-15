@@ -35,8 +35,12 @@ urlpatterns = [
     path('project/<int:project_id>/bid/', views.place_bid, name='place_bid'),
     path('company/dashboard/myportfolio/', views.myportfolio, name='myportfolio'),
     path('company/dashboard/myportfolio/all_jobs/', views.all_jobs, name='all_jobs'),
-    path('company/dashboard/mrportfolio/all-projects/', views.all_projects, name='all_projects'),
-    path('company/dashboard/mrportfolio/all-ideas/', views.all_ideas, name='all_ideas'),
+    path('company/dashboard/myportfolio/all-projects/', views.all_projects, name='all_projects'),
+    path('company/dashboard/myportfolio/all-ideas/', views.all_ideas, name='all_ideas'),
+    path('company/dashboard/myinternships/', views.myinternships, name='myinternships'),
+    path('company/dashboard/myinternships/post_internship', views.post_internship, name='post_internship'),
+    path('company/dashboard/myinternships/edit/<int:internship_id>/', views.edit_internship, name='edit_internship'),
+    path('delete_internship/<int:internship_id>/', views.delete_internship, name='delete_internship'),
 ]
 
 if settings.DEBUG:

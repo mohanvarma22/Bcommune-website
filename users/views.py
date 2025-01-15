@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
@@ -169,31 +169,7 @@ def ideas_and_invest(request):
     return render(request, 'ideasandinvest.html')
 
 
-def myjobs(request):
-    if not request.user.is_authenticated:
-        return redirect('company_login')
-    
-    # Get jobs for the current company user
-    company_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')
-    return render(request, 'myjobs.html', {'jobs': company_jobs})
 
-def post_job(request):
-    if request.method == 'POST':
-        try:
-            job = Job.objects.create(
-                title=request.POST.get('job_title'),
-                company=request.POST.get('company_name'),
-                location=request.POST.get('job_location'),
-                description=request.POST.get('job_description'),
-                requirements=request.POST.get('job_type'),
-                salary=request.POST.get('salary'),
-                company_user=request.user  # Add this line
-            )
-            return JsonResponse({'status': 'success', 'message': 'Job posted successfully!'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    
-    return render(request, 'create_job.html')
 
 @login_required
 def myprojects(request):
@@ -499,3 +475,84 @@ def all_ideas(request):
         'selected_idea_id': selected_idea_id
     })
 
+def myinternships(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    company_internships = Internship.objects.filter(company_user=request.user).order_by('-posted_date')
+    return render(request,'myinternships.html',{'internships':company_internships})
+
+def post_internship(request):
+    if request.method == 'POST':
+        try:
+            internship = Internship.objects.create(
+                title=request.POST.get('job_title'),  # Matches corrected form
+                company=request.POST.get('company_name'),
+                location=request.POST.get('job_location'),  # Matches corrected form
+                description=request.POST.get('job_description'),  # Matches corrected form
+                requirements=request.POST.get('job_type'),
+                duration=request.POST.get('duration'),
+                salary=request.POST.get('salary'),
+                company_user=request.user
+            )
+            return JsonResponse({'status': 'success', 'message': 'Internship posted successfully!'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    return render(request, 'post_internship.html')
+
+
+def myjobs(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    
+    # Get jobs for the current company user
+    company_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')
+    return render(request, 'myjobs.html', {'jobs': company_jobs})
+
+def post_job(request):
+    if request.method == 'POST':
+        try:
+            job = Job.objects.create(
+                title=request.POST.get('job_title'),
+                company=request.POST.get('company_name'),
+                location=request.POST.get('job_location'),
+                description=request.POST.get('job_description'),
+                requirements=request.POST.get('job_type'),
+                salary=request.POST.get('salary'),
+                company_user=request.user  # Add this line
+            )
+            return JsonResponse({'status': 'success', 'message': 'Job posted successfully!'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+    return render(request, 'create_job.html')
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_internship(request, internship_id):
+    try:
+        internship = get_object_or_404(Internship, id=internship_id, company_user=request.user)
+        internship.delete()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+def edit_internship(request, internship_id):  # Changed parameter name to internship_id
+    internship = get_object_or_404(Internship, id=internship_id, company_user=request.user)
+    
+    if request.method == 'POST':
+        try:
+            internship.title = request.POST.get('job_title')  # Updated with internship variable
+            internship.company = request.POST.get('company_name')
+            internship.location = request.POST.get('job_location')
+            internship.description = request.POST.get('job_description')
+            internship.requirements = request.POST.get('job_type')
+            internship.duration = request.POST.get('duration')
+            internship.salary = request.POST.get('salary')
+            internship.save()
+            return JsonResponse({'status': 'success', 'message': 'Internship updated successfully!'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    
+    return render(request, 'edit_internship.html', {'internship': internship})

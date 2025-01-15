@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <title>Edit Internship</title>
+</head>
+<body>
+    {% include 'header2.html' %}
+    <div class="main-container">
+        {% include 'sidebarcompany.html' %}
+        <div class="content">
+            <h2>Edit Internship</h2>
+            <form id="editInternshipForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Internship Title:</label>
+                    <input type="text" name="job_title" value="{{ internship.title }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Company Name:</label>
+                    <input type="text" name="company_name" value="{{ internship.company }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Location:</label>
+                    <input type="text" name="job_location" value="{{ internship.location }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Duration:</label>
+                    <input type="text" name="duration" value="{{ internship.duration }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Requirements:</label>
+                    <input type="text" name="job_type" value="{{ internship.requirements }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Salary:</label>
+                    <input type="text" name="salary" value="{{ internship.salary }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea name="job_description" required>{{ internship.description }}</textarea>
+                </div>
+                <button type="submit">Update Internship</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('editInternshipForm').onsubmit = function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/company/dashboard/myinternships/edit/{{ internship.id }}/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Internship updated successfully.');
+                    window.location.href = '{% url "myinternships" %}';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred while updating the internship.');
+            });
+        };
+    </script>
+</body>
+</html>

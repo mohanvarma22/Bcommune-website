@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Internships</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/myjobs.css'%}">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+<body>
+    {% include 'header2.html' %}
+    <div class="main-container">
+        {% include 'sidebarcompany.html' %}
+        <div class="content">
+            <section class="internship-explore">
+                <div class="post-requirement">
+                    <a href="{% url 'post_internship' %}" class="post-button">+ Post an Internship</a>
+                </div>
+                <h2>My Internships</h2>
+                <div class="internship-cards">
+                    {% if internships %}
+                        {% for internship in internships %}
+                            <div class="internship-card">
+                                <div class="card-header">
+                                    <h3>{{ internship.title }}</h3>
+                                    <p class="company">{{ internship.company }}</p>
+                                </div>
+                                <div class="card-body">
+                                    <p class="location">📍 {{ internship.location }}</p>
+                                    <p class="salary">💰 {{ internship.salary }}</p>
+                                    <p class="duration">🕒 Duration: {{ internship.duration }}</p>
+                                    <div class="requirements">
+                                        <h4>Requirements:</h4>
+                                        <p>{{ internship.requirements }}</p>
+                                    </div>
+                                </div>
+                                <p class="posted-date">Posted: {{ internship.posted_date|date:"M d, Y" }}</p>
+                                <div class="internship-actions">
+                                    <a href="{% url 'edit_internship' internship.id %}" class="edit-button">Edit</a>
+                                    <button class="delete-button" onclick="confirmDelete('{{ internship.id }}')">Delete</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-internships">No internships posted yet.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+    <script>
+        function confirmDelete(internshipId) {
+            if (confirm("Are you sure you want to delete this internship?")) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                fetch(`/delete_internship/${internshipId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Internship deleted successfully.');
+                        location.reload();
+                    } else {
+                        alert('Failed to delete the internship. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

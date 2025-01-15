@@ -76,6 +76,21 @@ class Job(models.Model):
     def __str__(self):
         return f"{self.title} at {self.company}"
     
+class Internship(models.Model):
+    title = models.CharField(max_length=200)
+    company = models.CharField(max_length=200)
+    company_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    location = models.CharField(max_length=200)
+    description = models.TextField()
+    requirements = models.CharField(max_length=200)  # or TextField()
+    salary = models.CharField(max_length=200, default="Not Specified") 
+    duration = models.CharField(max_length=100, default="Not Specified")
+    posted_date = models.DateTimeField(default=timezone.now)
+    # Add other fields as needed
+
+    def __str__(self):
+        return f"{self.title} at {self.company}"
+    
 class Project(models.Model):
     company = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
