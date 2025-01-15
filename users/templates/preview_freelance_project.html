@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preview Project</title>
+</head>
+<body>
+    <h1>Preview Your Project</h1>
+    <ul>
+        <li><strong>Title:</strong> {{ project_data.title }}</li>
+        <li><strong>Category:</strong> {{ project_data.category }}</li>
+        <li><strong>Description:</strong> {{ project_data.description }}</li>
+        <li><strong>Skills Required:</strong> {{ project_data.skills_required }}</li>
+        <li><strong>Duration:</strong> {{ project_data.duration }}</li>
+        <li><strong>Budget:</strong> {{ project_data.budget }}</li>
+        <li><strong>Payment Terms:</strong> {{ project_data.payment_terms }}</li>
+        <li><strong>Experience Level:</strong> {{ project_data.experience_level }}</li>
+        <li><strong>Location Preference:</strong> {{ project_data.location_preference }}</li>
+        <li><strong>Language Requirements:</strong> {{ project_data.language_requirements }}</li>
+        <li><strong>Attachments:</strong> {{ project_data.attachments }}</li>
+    </ul>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Submit Project</button>
+    </form>
+    <a href="{% url 'post_project' %}">Go Back</a>
+</body>
+</html>

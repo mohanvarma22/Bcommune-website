@@ -1,8 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import CustomUser, IndividualProfile, Bid
-
+from django.contrib.auth import get_user_model
+from .models import CustomUser, IndividualProfile, Bid, FreelanceProject
+CustomUser = get_user_model()
 class CompanySignupForm(UserCreationForm):
     INDUSTRY_CHOICES = [
         ('Agriculture', 'Agriculture'),
@@ -164,4 +165,19 @@ class BidForm(forms.ModelForm):
             'proposal': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'estimated_timeline': forms.NumberInput(attrs={'class': 'form-control'}),
             'additional_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+
+class FreelanceProjectForm(forms.ModelForm):
+    class Meta:
+        model = FreelanceProject
+        fields = [
+            'title', 'category', 'description', 'skills_required', 'duration', 
+            'budget', 'payment_terms', 'experience_level', 'location_preference', 
+            'language_requirements', 'attachments', 'company_name', 'company_description', 
+            'point_of_contact_name', 'point_of_contact_email', 'point_of_contact_phone'
+        ]
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 5}),
+            'skills_required': forms.TextInput(attrs={'placeholder': 'Comma-separated skills'}),
         }

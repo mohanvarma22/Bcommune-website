@@ -41,6 +41,12 @@ urlpatterns = [
     path('company/dashboard/myinternships/post_internship', views.post_internship, name='post_internship'),
     path('company/dashboard/myinternships/edit/<int:internship_id>/', views.edit_internship, name='edit_internship'),
     path('delete_internship/<int:internship_id>/', views.delete_internship, name='delete_internship'),
+    path('company/dashboard/freelance',views.freelance, name='freelance'),
+    path('company/dashboard/freelance/post_freelance',views.post_freelance, name='post_freelance'),
+    path('company/dashboard/freelance/post_freelance/preview_freelance_project',views.preview_freelance_project, name='preview_freelance_project'),
+    path('company/dashboard/project_success',views.project_success, name='project_success'),
+    path('dashboard/edit-freelance/<int:project_id>/', views.edit_freelance, name='edit_freelance'),
+    path('dashboard/delete-freelance/<int:project_id>/', views.delete_freelance, name='delete_freelance'),
 ]
 
 if settings.DEBUG:

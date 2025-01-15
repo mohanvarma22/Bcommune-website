@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -556,3 +556,77 @@ def edit_internship(request, internship_id):  # Changed parameter name to intern
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     
     return render(request, 'edit_internship.html', {'internship': internship})
+
+def freelance(request):
+    if not request.user.is_authenticated:
+        return redirect('company_login')
+    projects = FreelanceProject.objects.filter(user=request.user)
+    return render(request, 'freelance.html', {'projects': projects})
+
+def post_freelance(request):
+    if request.method == 'POST':
+        form = FreelanceProjectForm(request.POST, request.FILES)
+        if form.is_valid():
+            project_data = form.cleaned_data
+            request.session['project_data'] = project_data  # Save form data in session for preview
+            return redirect('preview_freelance_project')
+    else:
+        form = FreelanceProjectForm()
+
+    return render(request, 'post_freelance.html', {'form': form})
+
+def preview_freelance_project(request):
+    project_data = request.session.get('project_data', None)
+    if not project_data:
+        return redirect('post_project')
+
+    if request.method == 'POST':  # If confirmed, save the project
+        form = FreelanceProjectForm(project_data)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user  # Associate project with logged-in user
+            project.save()
+            del request.session['project_data']  # Clear session
+            return redirect('project_success')
+
+    return render(request, 'preview_freelance_project.html', {'project_data': project_data})
+
+def project_success(request):
+    return render(request, 'project_success.html')
+
+@login_required
+@require_http_methods(["POST"])
+def delete_freelance(request, project_id):
+    """
+    Delete a freelance project by its ID.
+    """
+    try:
+        project = get_object_or_404(FreelanceProject, id=project_id, user=request.user)
+        project.delete()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+
+@login_required
+def edit_freelance(request, project_id):
+    """
+    Edit a freelance project by its ID.
+    """
+    project = get_object_or_404(FreelanceProject, id=project_id, user=request.user)
+
+    if request.method == 'POST':
+        try:
+            # Bind the form to the POST data and the existing instance
+            form = FreelanceProjectForm(request.POST, request.FILES, instance=project)
+            if form.is_valid():
+                form.save()
+                return JsonResponse({'status': 'success', 'message': 'Freelance project updated successfully!'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid data submitted.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
+    # Render the edit form with the existing project data
+    form = FreelanceProjectForm(instance=project)
+    return render(request, 'edit_freelance.html', {'form': form, 'project': project})

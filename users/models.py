@@ -173,3 +173,53 @@ class Bid(models.Model):
         
     def __str__(self):
         return f"Bid by {self.bidder.company_name} on {self.project}"
+    
+
+class FreelanceProject(models.Model):
+    CATEGORY_CHOICES = [
+        ('Development', 'Development'),
+        ('Design', 'Design'),
+        ('Marketing', 'Marketing'),
+        ('Writing', 'Writing'),
+        ('Data Entry', 'Data Entry'),
+        ('Other', 'Other'),
+    ]
+
+    EXPERIENCE_LEVEL_CHOICES = [
+        ('Beginner', 'Beginner'),
+        ('Intermediate', 'Intermediate'),
+        ('Expert', 'Expert'),
+    ]
+
+    PAYMENT_TERMS_CHOICES = [
+        ('Milestone-based', 'Milestone-based'),
+        ('Hourly', 'Hourly'),
+        ('Fixed-price', 'Fixed-price'),
+    ]
+
+    DURATION_CHOICES = [
+        ('Less than 1 month', 'Less than 1 month'),
+        ('1-3 months', '1-3 months'),
+    ]
+
+    title = models.CharField(max_length=200)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    description = models.TextField()
+    skills_required = models.TextField()  # Store as comma-separated values
+    duration = models.CharField(max_length=50, choices=DURATION_CHOICES)
+    budget = models.CharField(max_length=50)
+    payment_terms = models.CharField(max_length=50, choices=PAYMENT_TERMS_CHOICES)
+    experience_level = models.CharField(max_length=50, choices=EXPERIENCE_LEVEL_CHOICES)
+    location_preference = models.CharField(max_length=200, blank=True, null=True)
+    language_requirements = models.CharField(max_length=200, blank=True, null=True)
+    attachments = models.FileField(upload_to='attachments/', blank=True, null=True)
+    company_name = models.CharField(max_length=200)
+    company_description = models.TextField()
+    point_of_contact_name = models.CharField(max_length=100)
+    point_of_contact_email = models.EmailField()
+    point_of_contact_phone = models.CharField(max_length=15)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
