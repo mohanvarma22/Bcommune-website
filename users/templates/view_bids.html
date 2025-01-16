@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bids for {{ project.title }}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bids for {{ project.title }}</h1>
+        <p><strong>Project Type:</strong> {{ project.project_type }}</p>
+        <p><strong>Industry:</strong> {{ project.industry }}</p>
+
+        <div class="bids-section">
+            {% if bids %}
+                <h2>Bids Received</h2>
+                {% for bid in bids %}
+                    <div class="bid-item">
+                        <p><strong>Bidder:</strong> {{ bid.bidder.company_name }}</p>
+                        <p><strong>Industry:</strong> {{ bid.bidder.industry }}</p>
+                        <p><strong>Core Services:</strong> {{ bid.bidder.core_services|linebreaks }}</p>
+                        <p><strong>Amount:</strong> ${{ bid.amount }}</p>
+                        <p><strong>Timeline:</strong> {{ bid.estimated_timeline }} days</p>
+                        <p><strong>Proposal:</strong> {{ bid.proposal|linebreaks }}</p>
+                        {% if bid.additional_details %}
+                            <p><strong>Additional Details:</strong> {{ bid.additional_details }}</p>
+                        {% endif %}
+                        <p><strong>Company Website:</strong> <a href="{{ bid.bidder.company_website }}" target="_blank">
+                            {{ bid.bidder.company_website }}</a>
+                        </p>
+                        <p><strong>Submitted:</strong> {{ bid.created_at|timesince }} ago</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No bids have been received for this project yet.</p>
+            {% endif %}
+        </div>
+        
+
+        <a href="{% url 'all_projects' %}" class="btn-back">Back to Projects</a>
+    </div>
+</body>
+</html>

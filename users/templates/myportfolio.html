@@ -284,6 +284,40 @@
         {% endif %}
     </div>
 </section>
+<section class="portfolio-internships">
+    <a href="{% url 'all_internships' %}?internship_id={{ internship.id }}">
+        <h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Internships Posted</h2>
+    </a>
+    <div class="internship-cards-container">
+        {% if internships %}
+            {% for internship in internships %}
+            <a href="{% url 'all_internships' %}?internship_id={{ internship.id }}" style="text-decoration: none; color: inherit;">
+                <div class="internship-card">
+                    <div class="card-header">
+                        <div class="header-content">
+                            <h3>{{ internship.title }}</h3>
+                            <p class="company">{{ internship.company }}</p>
+                        </div>
+                        <img src="{% static 'images/B.png' %}" alt="{{ internship.company }} Logo" class="header-image" style="border-radius: 50%;">
+                    </div>
+                    <div class="card-body">
+                        <p class="location">📍 {{ internship.location }}</p>
+                        <p class="stipend">💰 {{ internship.stipend }}</p>
+                        <div class="requirements">
+                            <h4>Requirements:</h4>
+                            <p>{{ internship.requirements }}</p>
+                        </div>
+                    </div>
+                    <p class="posted-date">Posted: {{ internship.posted_date|date:"M d, Y" }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        {% else %}
+            <p class="no-internships">No internships available in the portfolio.</p>
+        {% endif %}
+    </div>
+</section>
+
         </div>
     </div>
 

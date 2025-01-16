@@ -218,13 +218,8 @@
                     <div class="detail-section">
                         <p>Posted on: {{ project.created_at|date:"M d, Y" }}</p>
                     </div>
-                    <button 
-            onclick="toggleBids('{{ project.id }}')"
-            class="view-bids-btn"
-            id="toggle-btn-{{ project.id }}"
-        >
-            View Bids
-        </button>
+                    <a href="{% url 'view_bids' project.id %}" class="view-bids-btn">View Bids</a>
+
                 </div>
 
             {% endfor %}

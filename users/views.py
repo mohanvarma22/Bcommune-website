@@ -435,7 +435,15 @@ def myportfolio(request):
     recent_jobs = Job.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
     recent_projects = Project.objects.filter(company=request.user).order_by('-created_at')[:3]
     recent_ideas = Idea.objects.all().order_by('-created_at')[:3]
-    return render(request, 'myportfolio.html', {'jobs': recent_jobs,'projects': recent_projects,'ideas': recent_ideas})
+    recent_internships = Internship.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
+    
+    return render(request, 'myportfolio.html', {
+        'jobs': recent_jobs,
+        'projects': recent_projects,
+        'ideas': recent_ideas,
+        'internships': recent_internships
+    })
+
 
 def all_jobs(request):
     if not request.user.is_authenticated:
@@ -630,3 +638,20 @@ def edit_freelance(request, project_id):
     # Render the edit form with the existing project data
     form = FreelanceProjectForm(instance=project)
     return render(request, 'edit_freelance.html', {'form': form, 'project': project})
+
+def view_bids(request, project_id):
+    # Fetch the project and its associated bids
+    project = get_object_or_404(Project, id=project_id)
+    bids = project.bids.select_related('bidder').order_by('-created_at')  # Assuming related_name is `bids` in the ForeignKey
+
+    context = {
+        "project": project,
+        "bids": bids,
+    }
+    return render(request, "view_bids.html", context)
+
+def all_internships(request):
+    internships = Internship.objects.filter(company_user=request.user).order_by('-posted_date')
+    
+    return render(request, 'all_internships.html', {'internships': internships})
+
