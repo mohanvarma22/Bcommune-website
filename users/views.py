@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -453,12 +453,15 @@ def myportfolio(request):
     recent_projects = Project.objects.filter(company=request.user).order_by('-created_at')[:3]
     recent_ideas = Idea.objects.all().order_by('-created_at')[:3]
     recent_internships = Internship.objects.filter(company_user=request.user).order_by('-posted_date')[:3]
+    # Add this line to fetch recent freelance projects
+    recent_freelance_projects = FreelanceProject.objects.filter(user=request.user).order_by('-created_at')[:3]
     
     return render(request, 'myportfolio.html', {
         'jobs': recent_jobs,
         'projects': recent_projects,
         'ideas': recent_ideas,
-        'internships': recent_internships
+        'internships': recent_internships,
+        'freelance_projects': recent_freelance_projects  # Add this line
     })
 
 
@@ -684,3 +687,41 @@ def place_freelance_bid(request, project_id):
         # Handle bid placement logic here, e.g., save bid details
         return redirect('all_freelance_projects')  # Redirect back to projects page or another relevant page
     return render(request, 'place_bid.html', {'project': project})
+
+@login_required
+def place_freelance_bid(request, project_id):
+    project = get_object_or_404(FreelanceProject, id=project_id)
+    
+    # Check if user has already placed a bid
+    existing_bid = FreelanceBid.objects.filter(project=project, bidder=request.user).first()
+    if existing_bid:
+        return redirect('view_my_freelance_bid', project_id=project_id)
+    
+    if request.method == 'POST':
+        form = FreelanceBidForm(request.POST)
+        if form.is_valid():
+            bid = form.save(commit=False)
+            bid.project = project
+            bid.bidder = request.user
+            bid.save()
+            messages.success(request, 'Your bid has been submitted successfully!')
+            return redirect('all_freelance_projects')
+    else:
+        form = FreelanceBidForm(initial={
+            'name': request.user.get_full_name(),
+            'email': request.user.email
+        })
+    
+    return render(request, 'place_freelance_bid.html', {
+        'form': form,
+        'project': project
+    })
+
+@login_required
+def view_my_freelance_bid(request, project_id):
+    project = get_object_or_404(FreelanceProject, id=project_id)
+    bid = get_object_or_404(FreelanceBid, project=project, bidder=request.user)
+    return render(request, 'view_my_freelance_bid.html', {
+        'bid': bid,
+        'project': project
+    })

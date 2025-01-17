@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Place Bid for {{ project.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="project-summary mb-4">
+                        <h5>Project Details</h5>
+                        <p><strong>Budget:</strong> ${{ project.budget }}</p>
+                        <p><strong>Duration:</strong> {{ project.duration }}</p>
+                        <p><strong>Skills Required:</strong> {{ project.skills_required }}</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.name.id_for_label }}">Full Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.email.id_for_label }}">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.portfolio_links.id_for_label }}">Portfolio Links</label>
+                            {{ form.portfolio_links }}
+                            <small class="text-muted">Add your portfolio links (one per line)</small>
+                            {% if form.portfolio_links.errors %}
+                                <div class="text-danger">{{ form.portfolio_links.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.previous_works.id_for_label }}">Previous Works</label>
+                            {{ form.previous_works }}
+                            {% if form.previous_works.errors %}
+                                <div class="text-danger">{{ form.previous_works.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.expected_pay.id_for_label }}">Expected Pay ($)</label>
+                            {{ form.expected_pay }}
+                            {% if form.expected_pay.errors %}
+                                <div class="text-danger">{{ form.expected_pay.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.timeline.id_for_label }}">Timeline</label>
+                            {{ form.timeline }}
+                            {% if form.timeline.errors %}
+                                <div class="text-danger">{{ form.timeline.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="{{ form.execution_plan.id_for_label }}">How will you execute this project?</label>
+                            {{ form.execution_plan }}
+                            {% if form.execution_plan.errors %}
+                                <div class="text-danger">{{ form.execution_plan.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Submit Bid</button>
+                            <a href="{% url 'all_freelance_projects' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

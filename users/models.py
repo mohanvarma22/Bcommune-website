@@ -224,3 +224,19 @@ class FreelanceProject(models.Model):
     def __str__(self):
         return self.title
     
+# models.py
+class FreelanceBid(models.Model):
+    project = models.ForeignKey(FreelanceProject, on_delete=models.CASCADE, related_name='bids')
+    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    portfolio_links = models.TextField(help_text="Add your portfolio links (one per line)")
+    previous_works = models.TextField(help_text="Describe your relevant previous works")
+    expected_pay = models.DecimalField(max_digits=10, decimal_places=2)
+    timeline = models.CharField(max_length=100)
+    execution_plan = models.TextField(help_text="Describe how you plan to execute this project")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Bid by {self.name} for {self.project.title}"

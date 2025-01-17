@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from .models import CustomUser, IndividualProfile, Bid, FreelanceProject
+from .models import CustomUser, IndividualProfile, Bid, FreelanceProject, FreelanceBid
 CustomUser = get_user_model()
 class CompanySignupForm(UserCreationForm):
     INDUSTRY_CHOICES = [
@@ -180,4 +180,15 @@ class FreelanceProjectForm(forms.ModelForm):
         widgets = {
             'description': forms.Textarea(attrs={'rows': 5}),
             'skills_required': forms.TextInput(attrs={'placeholder': 'Comma-separated skills'}),
+        }
+
+class FreelanceBidForm(forms.ModelForm):
+    class Meta:
+        model = FreelanceBid
+        fields = ['name', 'email', 'phone', 'portfolio_links', 'previous_works', 
+                 'expected_pay', 'timeline', 'execution_plan']
+        widgets = {
+            'portfolio_links': forms.Textarea(attrs={'rows': 4}),
+            'previous_works': forms.Textarea(attrs={'rows': 6}),
+            'execution_plan': forms.Textarea(attrs={'rows': 8}),
         }

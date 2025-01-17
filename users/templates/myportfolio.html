@@ -317,7 +317,42 @@
         {% endif %}
     </div>
 </section>
-
+<section class="portfolio-freelance">
+    <a href="{% url 'all_freelance_projects' %}">
+        <h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Recent Freelance Projects</h2>
+    </a>
+    <div class="freelance-cards-container">
+        {% if freelance_projects %}
+            {% for project in freelance_projects|slice:":3" %}
+                {% if project.company == request.user.company %}  <!-- Assuming you have a company field in FreelanceProject model -->
+                    <a href="{% url 'all_freelance_projects' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
+                        <div class="freelance-card">
+                            <div class="card-header">
+                                <div class="header-content">
+                                    <h3>{{ project.title }}</h3>
+                                    <p class="category">{{ project.category }}</p>
+                                </div>
+                                <img src="{% static 'images/B.png' %}" alt="Company Logo" class="header-image" style="border-radius: 50%;">
+                            </div>
+                            <div class="card-body">
+                                <p class="location">📍 {{ project.location_preference|default:"Remote" }}</p>
+                                <p class="budget">💰 ${{ project.budget }}</p>
+                                <p class="duration">⏱️ {{ project.duration }}</p>
+                                <div class="skills">
+                                    <h4>Skills Required:</h4>
+                                    <p>{{ project.skills_required }}</p>
+                                </div>
+                            </div>
+                            <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </a>
+                {% endif %}
+            {% empty %}
+                <p class="no-projects">No freelance projects posted yet.</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
         </div>
     </div>
 
