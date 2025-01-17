@@ -10,7 +10,16 @@
 
 </head>
 <body>
+    <style>
+        .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+    </style>
     {% include 'header1.html' %}
     
     
@@ -74,10 +83,27 @@
             </section>
 
             <!-- Freelance Section -->
-            <section id="freelance">
-                <h3>Freelance for a Project</h3>
-                <div class="cards-container" id="freelance-container"></div>
+            <!-- Freelance Section -->
+            <section id="freelance-projects">
+                <a href="{% url 'all_freelance_projects' %}"><h3>Freelance Projects</h3></a>
+                <div class="cards-container">
+                    {% for project in freelance_projects %}
+                        <div class="card" onclick="window.location.href='{% url 'all_freelance_projects' %}?project_id={{ project.id }}';" style="cursor: pointer;">
+                            <h4>{{ project.title }}</h4>
+                            <p><strong>Category:</strong> {{ project.category }}</p>
+                            <p><strong>Budget:</strong> {{ project.budget }}</p>
+                            <p><strong>Experience Level:</strong> {{ project.experience_level }}</p>
+                            <p><strong>Duration:</strong> {{ project.duration }}</p>
+                            <p>{{ project.description|truncatewords:20 }}</p>
+                            <p><strong>Skills Required:</strong> {{ project.skills_required }}</p>
+                            <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No freelance projects available at the moment.</p>
+                    {% endfor %}
+                </div>
             </section>
+            
 
             <!-- Internships Section -->
             <section id="internships">

@@ -315,7 +315,7 @@
                                 </div>
                             </div>
                             {% if user.is_authenticated and user.user_type == 'company' and first_project.company != user %}
-                                <a href="{% url 'place_bid' first_project.id %}" class="btn btn-primary">Place Bid</a>
+                                <a href="{% url 'place_project_bid' first_project.id %}" class="btn btn-primary">Place Bid</a>
                             {% endif %}
                         {% else %}
                             <p class="no-projects">Select a project to view details</p>

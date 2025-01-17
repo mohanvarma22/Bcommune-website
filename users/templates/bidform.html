@@ -96,7 +96,7 @@
         {% endif %}
 
         <h1>Submit Your Bid</h1>
-        <form action="{% url 'place_bid' project.id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'place_project_bid' project.id %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="button-group">

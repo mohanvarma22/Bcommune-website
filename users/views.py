@@ -69,9 +69,26 @@ def individual_login(request):
 def individual_dashboard(request):
     if request.user.user_type != 'individual':
         return redirect('individual_login')
-    ideas = Idea.objects.all()  # Get all ideas submitted
+
+    # Fetch all ideas
+    ideas = Idea.objects.all()
+
+    # Fetch jobs and order by the most recent
     jobs = Job.objects.all().order_by('-posted_date')
-    return render(request, 'individual_dashboard.html', {'ideas': ideas, 'jobs':jobs})
+
+    # Fetch top 3 most recent freelance projects
+    freelance_projects = FreelanceProject.objects.all().order_by('-created_at')[:3]
+
+    # Render the dashboard
+    return render(
+        request,
+        'individual_dashboard.html',
+        {
+            'ideas': ideas,
+            'jobs': jobs,
+            'freelance_projects': freelance_projects,
+        }
+    )
 
 def company_signup(request):
     if request.method == 'POST':
@@ -392,7 +409,7 @@ def faq(request):
     return render(request,'faq.html')
 
 @login_required
-def place_bid(request, project_id):
+def place_project_bid(request, project_id):
     # Check if user is a company
     if request.user.user_type != 'company':
         messages.error(request, "Only companies can place bids!")
@@ -655,3 +672,15 @@ def all_internships(request):
     
     return render(request, 'all_internships.html', {'internships': internships})
 
+def all_freelance_projects(request):
+    freelance_projects = FreelanceProject.objects.all().order_by('-created_at')
+    return render(request, 'all_freelance_projects.html', {'freelance_projects': freelance_projects})
+
+
+@login_required
+def place_freelance_bid(request, project_id):
+    project = get_object_or_404(FreelanceProject, id=project_id)
+    if request.method == 'POST':
+        # Handle bid placement logic here, e.g., save bid details
+        return redirect('all_freelance_projects')  # Redirect back to projects page or another relevant page
+    return render(request, 'place_bid.html', {'project': project})

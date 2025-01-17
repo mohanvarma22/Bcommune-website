@@ -32,7 +32,7 @@ urlpatterns = [
     path('individual/profile/', views.individual_profile, name='individual_profile'),
     path('company/dashboard/profile/', views.company_profile, name='company_profile'),
     path('faq',views.faq,name='faq'),
-    path('project/<int:project_id>/bid/', views.place_bid, name='place_bid'),
+    path('project/<int:project_id>/bid/', views.place_project_bid, name='place_project_bid'),
     path('company/dashboard/myportfolio/', views.myportfolio, name='myportfolio'),
     path('company/dashboard/myportfolio/all_jobs/', views.all_jobs, name='all_jobs'),
     path('company/dashboard/myportfolio/all-projects/', views.all_projects, name='all_projects'),
@@ -49,6 +49,8 @@ urlpatterns = [
     path('dashboard/delete-freelance/<int:project_id>/', views.delete_freelance, name='delete_freelance'),
     path("projects/<int:project_id>/bids/", views.view_bids, name="view_bids"),
     path('company/dashboard/myportfolio/all-internships/', views.all_internships, name='all_internships'),
+    path('individual/dashboard/all_freelance_projects/', views.all_freelance_projects, name='all_freelance_projects'),
+    path('individual/dashboard/all_freelance_projects/place-bid/<int:project_id>/', views.place_freelance_bid, name='place_freelance_bid'),
 ]
 
 if settings.DEBUG:
