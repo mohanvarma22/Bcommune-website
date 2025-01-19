@@ -60,6 +60,7 @@ urlpatterns = [
      path('individual/dashboard/individual_alljobs/', views.individual_alljobs, name='individual_alljobs'),
      path('individual/dashboard/individual_alljobs/apply_job/<int:job_id>/', views.apply_job, name='apply_job'),
      path('job_success/',views.job_success,name="job_success"),
+     path('company/dashboard/myportfolio/all_jobs/view_applications/<int:job_id>/',views.view_applications,name='view_applications'),
 ]
 
 if settings.DEBUG:

@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -756,29 +756,38 @@ def individual_alljobs(request):
     })
 
 def apply_job(request, job_id):
-    # Fetch the job object
     job = get_object_or_404(Job, id=job_id)
     
     if request.method == 'POST':
-        # Get additional data if needed from the form
-        applicant_name = request.POST.get('name')
-        applicant_email = request.POST.get('email')
-        cover_letter = request.POST.get('cover_letter')
-        
-        # Create a job application
-        JobApplication.objects.create(
-            job=job,
-            user=request.user,  # Assuming the user is logged in
-            name=applicant_name,
-            email=applicant_email,
-            cover_letter=cover_letter
-        )
-        
-        # Show a success message
-        messages.success(request, 'You have successfully applied for the job!')
-        return redirect('individual_alljobs')  # Redirect to the jobs list page
+        form = JobApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.job = job
+            application.user = request.user
+            application.name = f"{request.user.first_name} {request.user.last_name}"  # Get the user's name
+            application.save()
+            job.applications_count = JobApplication.objects.filter(job=job).count()
+            job.save()
+            messages.success(request, 'You have successfully applied for the job!')
+            return redirect('job_success')  # Redirect to a success page
     
-    return render(request, 'apply_jobs.html', {'job': job})
+    else:
+        form = JobApplicationForm()
+        
+    job.applications_count = JobApplication.objects.filter(job=job).count()
+    return render(request, 'apply_jobs.html', {'job': job, 'form': form})
+
 
 def job_success(request):
     return render(request,'job_success.html')
+
+def view_applications(request, job_id):
+    job = get_object_or_404(Job, id=job_id)  # Get the specific job
+    applications = JobApplication.objects.filter(job=job)  # Fetch applications for this job
+    job.applications_count = applications.count()
+
+    return render(request, 'view_applications.html', {
+        'job': job,
+        'applications': applications,
+        
+    })

@@ -131,6 +131,24 @@
             background-color: #c82333;
             transform: translateY(-1px);
         }
+        .view-btn {
+    background-color: #28a745;  /* Green color for view button */
+}
+
+.view-btn:hover {
+    background-color: #218838;
+}
+
+.application-count {
+    display: inline-block;
+    margin-left: 5px;
+    font-weight: normal;
+    color: white;
+    /* Optional: add a subtle background */
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
     </style>
 </head>
 <body>
@@ -189,13 +207,16 @@
                     <div class="detail-section">
                         <p>Posted on: {{ job.posted_date|date:"M d, Y" }}</p>
                     </div>
-
+                    
                     <div class="action-buttons">
                         <a href="{% url 'edit_job' job.id %}" class="action-btn edit-btn">
                             Edit Job
                         </a>
                         <a href="#" class="action-btn delete-btn" onclick="confirmDelete('{{ job.id }}'); return false;">
                             Delete Job
+                        </a>
+                        <a href="{% url 'view_applications' job.id %}" class="action-btn view-btn">
+                            View Applications 
                         </a>
                     </div>
                 </div>

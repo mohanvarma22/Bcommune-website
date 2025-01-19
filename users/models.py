@@ -243,9 +243,9 @@ class FreelanceBid(models.Model):
     
 
 class JobApplication(models.Model):
-    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # To link with the user
     job = models.ForeignKey('Job', on_delete=models.CASCADE)  # Link to the job being applied for
+    name = models.CharField(max_length=255, default='Unknown')  # Add this field with a default value
     phone_number = models.CharField(max_length=15)
     degree = models.CharField(max_length=50)
     percentage = models.FloatField()

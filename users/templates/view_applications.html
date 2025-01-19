@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications for {{ job.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <style>
+        .applications-container {
+            padding: 20px;
+        }
+
+        .application-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .applicant-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .applicant-detail {
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .resume-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .resume-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header2.html' %}
+    <div class="applications-container">
+        <h1>Applications for "{{ job.title }}"</h1>
+
+        {% if applications %}
+            {% for application in applications %}
+                <div class="application-card">
+                    <div class="applicant-name">{{ application.name }}</div>
+                    <div class="applicant-detail">📞 {{ application.phone_number }}</div>
+                    <div class="applicant-detail">🎓 {{ application.degree }} ({{ application.percentage }}%)</div>
+                    <div class="applicant-detail">💼 {{ application.work_experience }} years experience</div>
+                    <div class="applicant-detail">
+                        <a href="{{ application.resume.url }}" target="_blank" class="resume-link">View Resume</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No applications found for this job.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
