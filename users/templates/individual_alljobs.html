@@ -159,6 +159,29 @@
                             </div>
 
                             <div class="detail-section">
+                                <h3>Required Skills</h3>
+                                <p>{{ job.required_skills }}</p>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3>Minimum Experience</h3>
+                                <p>{{ job.min_experience }} years</p>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3>Required Qualification</h3>
+                                <p>
+                                    {% if job.required_qualification == 'bachelor' %}
+                                        Bachelor's Degree
+                                    {% elif job.required_qualification == 'master' %}
+                                        Master's Degree
+                                    {% elif job.required_qualification == 'phd' %}
+                                        PhD
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="detail-section">
                                 <h3>Description</h3>
                                 <p>{{ job.description }}</p>
                             </div>

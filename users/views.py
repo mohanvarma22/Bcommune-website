@@ -8,6 +8,7 @@ from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfil
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ValidationError
 
 def logout_view(request):
     logout(request)
@@ -285,19 +286,59 @@ def edit_job(request, job_id):
     
     if request.method == 'POST':
         try:
+            # Validate minimum experience
+            min_experience = request.POST.get('min_experience')
+            if not min_experience or not min_experience.isdigit():
+                raise ValidationError('Minimum experience must be a valid number')
+            
+            # Validate required skills
+            required_skills = request.POST.get('skills', '').strip()
+            if not required_skills:
+                raise ValidationError('Required skills cannot be empty')
+            # Clean and validate skills format
+            skills_list = [skill.strip() for skill in required_skills.split(',')]
+            skills_list = [skill for skill in skills_list if skill]  # Remove empty entries
+            if not skills_list:
+                raise ValidationError('At least one valid skill must be provided')
+            
+            # Validate qualification
+            qualification = request.POST.get('required_qualification')
+            valid_qualifications = ['bachelor', 'master', 'phd']
+            if not qualification or qualification.lower() not in valid_qualifications:
+                raise ValidationError('Invalid qualification selected')
+            
+            # Update job fields
             job.title = request.POST.get('job_title')
             job.company = request.POST.get('company_name')
             job.location = request.POST.get('job_location')
             job.description = request.POST.get('job_description')
             job.requirements = request.POST.get('job_type')
             job.salary = request.POST.get('salary')
+            job.required_skills = ','.join(skills_list)
+            job.required_qualification = qualification.lower()
+            job.min_experience = int(min_experience)
+            
+            # Perform model validation
+            job.full_clean()
             job.save()
-            return JsonResponse({'status': 'success', 'message': 'Job updated successfully!'})
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Job updated successfully!'
+            })
+            
+        except ValidationError as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e),
+            }, status=400)
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+            return JsonResponse({
+                'status': 'error',
+                'message': 'An unexpected error occurred while updating the job.',
+            }, status=500)
     
     return render(request, 'edit_job.html', {'job': job})
-
 @login_required
 @require_http_methods(["POST"])
 def delete_job(request, job_id):
@@ -547,7 +588,10 @@ def post_job(request):
                 description=request.POST.get('job_description'),
                 requirements=request.POST.get('job_type'),
                 salary=request.POST.get('salary'),
-                company_user=request.user  # Add this line
+                company_user=request.user,  # Add this line
+                required_skills=request.POST.get('required_skills', ''),  # New field
+                min_experience=request.POST.get('min_experience', 0),  # New field
+                required_qualification=request.POST.get('required_qualification', 'bachelor')
             )
             return JsonResponse({'status': 'success', 'message': 'Job posted successfully!'})
         except Exception as e:

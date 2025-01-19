@@ -206,6 +206,11 @@ class JobApplicationForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
+    skills = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Enter your skills separated by commas'}),
+        help_text="Enter your skills separated by commas"
+    )
+
     class Meta:
         model = JobApplication
-        fields = ['phone_number', 'degree', 'percentage', 'work_experience', 'resume']
+        fields = ['phone_number', 'degree', 'percentage', 'work_experience', 'resume', 'skills']

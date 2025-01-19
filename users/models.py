@@ -68,10 +68,13 @@ class Job(models.Model):
     company_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     location = models.CharField(max_length=200)
     description = models.TextField()
-    requirements = models.CharField(max_length=200)  # or TextField()
-    salary = models.CharField(max_length=200, default="Not Specified") 
+    requirements = models.CharField(max_length=200)
+    salary = models.CharField(max_length=200, default="Not Specified")
     posted_date = models.DateTimeField(default=timezone.now)
-    # Add other fields as needed
+    # New fields for matching
+    required_skills = models.TextField(help_text="Enter required skills separated by commas", default='')
+    min_experience = models.PositiveIntegerField(default=0)
+    required_qualification = models.CharField(max_length=50, default='bachelor')
 
     def __str__(self):
         return f"{self.title} at {self.company}"
@@ -114,24 +117,24 @@ class Project(models.Model):
 class IndividualProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True) # 3
     tagline = models.CharField(max_length=255, blank=True, null=True)
     availability_status = models.CharField(max_length=50, choices=[
         ('actively_looking', 'Actively Looking'),
         ('not_available', 'Not Available'),
         ('open_to_offers', 'Open to Offers')
-    ], default='open_to_offers')
+    ], default='open_to_offers') #3
     about_me = models.TextField(blank=True, null=True)
-    key_skills = models.JSONField(blank=True, null=True)  # Store as a list of skills
-    industries_of_interest = models.JSONField(blank=True, null=True)  # Store as a list
+    key_skills = models.JSONField(blank=True, null=True)  # Store as a list of skills 1
+    industries_of_interest = models.JSONField(blank=True, null=True)  # Store as a list 2
     desired_role = models.CharField(max_length=255, blank=True, null=True)
     desired_location = models.CharField(max_length=255, blank=True, null=True)
     work_type = models.CharField(max_length=50, choices=[
         ('remote', 'Remote'),
         ('hybrid', 'Hybrid'),
         ('on_site', 'On-Site')
-    ], default='remote')
-    salary_expected = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    ], default='remote') #4
+    salary_expected = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
 
     # Work Experience Section
     current_position_title = models.CharField(max_length=255, blank=True, null=True)
@@ -140,10 +143,10 @@ class IndividualProfile(models.Model):
     key_responsibilities = models.TextField(blank=True, null=True)
 
     # Education Section
-    qualification = models.CharField(max_length=255, blank=True, null=True)
+    qualification = models.CharField(max_length=255, blank=True, null=True)#5
     institution = models.CharField(max_length=255, blank=True, null=True)
     year_of_completion = models.IntegerField(blank=True, null=True)
-    certifications = models.JSONField(blank=True, null=True)  # Store as a list
+    certifications = models.JSONField(blank=True, null=True)  # Store as a list 6
 
     # Portfolio/Projects Section
     projects = models.JSONField(blank=True, null=True)  # Store projects as a list of dicts
@@ -243,15 +246,131 @@ class FreelanceBid(models.Model):
     
 
 class JobApplication(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # To link with the user
-    job = models.ForeignKey('Job', on_delete=models.CASCADE)  # Link to the job being applied for
-    name = models.CharField(max_length=255, default='Unknown')  # Add this field with a default value
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    job = models.ForeignKey('Job', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, default='Unknown')
     phone_number = models.CharField(max_length=15)
     degree = models.CharField(max_length=50)
     percentage = models.FloatField()
-    work_experience = models.PositiveIntegerField()  # Years of experience
-    resume = models.FileField(upload_to='resumes/')  # Upload resumes to "resumes/" directory
-    applied_at = models.DateTimeField(auto_now_add=True)  # Timestamp when applied
+    work_experience = models.PositiveIntegerField()
+    resume = models.FileField(upload_to='resumes/')
+    applied_at = models.DateTimeField(auto_now_add=True)
+    # New field for matching
+    skills = models.TextField(default='', help_text="Enter your skills separated by commas")
 
     def __str__(self):
         return f"{self.user.name} - {self.job.title}"
+# your_app/matchers.py
+
+from fuzzywuzzy import fuzz
+
+class JobMatcher:
+    def __init__(self):
+        self.weights = {
+            'skills_match': 0.40,
+            'experience_match': 0.30,
+            'education_match': 0.30
+        }
+    
+    def calculate_match(self, application, job):
+        """Main method to calculate overall match score"""
+        scores = {
+            'skills_match': self._calculate_skills_score(application.skills, job.required_skills),
+            'experience_match': self._calculate_experience_score(
+                application.work_experience, 
+                job.min_experience
+            ),
+            'education_match': self._calculate_education_score(
+                application.degree, 
+                job.required_qualification
+            )
+        }
+        
+        weighted_score = sum(
+            scores[key] * self.weights[key] 
+            for key in scores
+        )
+        
+        return {
+            'overall_score': round(weighted_score, 1),
+            'detailed_scores': scores,
+            'matching_skills': self._get_matching_skills(application.skills, job.required_skills),
+            'missing_skills': self._get_missing_skills(application.skills, job.required_skills)
+        }
+    
+    def _calculate_skills_score(self, applicant_skills, job_skills):
+        """Calculate skill match percentage using fuzzy matching"""
+        if not job_skills:
+            return 0
+            
+        applicant_skills = set(s.strip().lower() for s in applicant_skills.split(','))
+        job_skills = set(s.strip().lower() for s in job_skills.split(','))
+        
+        if not job_skills:
+            return 0
+            
+        matches = sum(
+            max(fuzz.ratio(j_skill, a_skill) for a_skill in applicant_skills) > 80
+            for j_skill in job_skills
+        )
+        return (matches / len(job_skills)) * 100
+    
+    def _calculate_experience_score(self, applicant_exp, required_exp):
+        """Calculate experience match percentage"""
+        if not required_exp:
+            return 100
+            
+        if applicant_exp >= required_exp:
+            if applicant_exp <= required_exp * 1.5:
+                return 100
+            else:
+                # Slightly penalize over-qualification
+                return 100 * (required_exp * 1.5) / applicant_exp
+        return (applicant_exp / required_exp) * 100
+    
+    def _calculate_education_score(self, applicant_edu, required_edu):
+        """Calculate education match percentage"""
+        education_levels = {
+            'high school': 1,
+            'diploma': 2,
+            'bachelor': 3,
+            'master': 4,
+            'phd': 5
+        }
+        
+        applicant_level = education_levels.get(applicant_edu.lower(), 0)
+        required_level = education_levels.get(required_edu.lower(), 0)
+        
+        if applicant_level >= required_level:
+            return 100
+        return (applicant_level / required_level) * 100 if required_level else 0
+    
+    def _get_matching_skills(self, applicant_skills, job_skills):
+        """Get list of matching skills"""
+        if not applicant_skills or not job_skills:
+            return []
+            
+        applicant_skills = [s.strip().lower() for s in applicant_skills.split(',')]
+        job_skills = [s.strip().lower() for s in job_skills.split(',')]
+        
+        matching = []
+        for job_skill in job_skills:
+            if any(fuzz.ratio(job_skill, app_skill) > 80 for app_skill in applicant_skills):
+                matching.append(job_skill)
+        
+        return matching
+    
+    def _get_missing_skills(self, applicant_skills, job_skills):
+        """Get list of missing required skills"""
+        if not job_skills:
+            return []
+            
+        applicant_skills = [s.strip().lower() for s in applicant_skills.split(',')]
+        job_skills = [s.strip().lower() for s in job_skills.split(',')]
+        
+        missing = []
+        for job_skill in job_skills:
+            if not any(fuzz.ratio(job_skill, app_skill) > 80 for app_skill in applicant_skills):
+                missing.append(job_skill)
+        
+        return missing

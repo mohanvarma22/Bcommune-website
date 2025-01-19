@@ -10,7 +10,7 @@
         .applications-container {
             padding: 20px;
         }
-
+        
         .application-card {
             background: #f9f9f9;
             border: 1px solid #ddd;
@@ -19,26 +19,68 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
+        
         .applicant-name {
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 8px;
         }
-
+        
         .applicant-detail {
             margin-bottom: 5px;
             color: #666;
         }
-
+        
         .resume-link {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
+            cursor: pointer;
         }
-
+        
         .resume-link:hover {
             text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            margin: 5% auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .resume-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -46,7 +88,7 @@
     {% include 'header2.html' %}
     <div class="applications-container">
         <h1>Applications for "{{ job.title }}"</h1>
-
+        
         {% if applications %}
             {% for application in applications %}
                 <div class="application-card">
@@ -54,6 +96,7 @@
                     <div class="applicant-detail">📞 {{ application.phone_number }}</div>
                     <div class="applicant-detail">🎓 {{ application.degree }} ({{ application.percentage }}%)</div>
                     <div class="applicant-detail">💼 {{ application.work_experience }} years experience</div>
+                    <div class="applicant-detail">🛠 Skills: {{ application.skills }}</div>
                     <div class="applicant-detail">
                         <a href="{{ application.resume.url }}" target="_blank" class="resume-link">View Resume</a>
                     </div>
@@ -63,5 +106,50 @@
             <p>No applications found for this job.</p>
         {% endif %}
     </div>
+
+    <!-- Modal -->
+    <div id="resumeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeResumeModal()">&times;</span>
+            <iframe id="resumeIframe" class="resume-iframe"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function openResumeModal(resumeUrl) {
+            const modal = document.getElementById('resumeModal');
+            const iframe = document.getElementById('resumeIframe');
+            iframe.src = resumeUrl;
+            modal.style.display = 'block';
+            
+            // Prevent body scrolling when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeResumeModal() {
+            const modal = document.getElementById('resumeModal');
+            const iframe = document.getElementById('resumeIframe');
+            modal.style.display = 'none';
+            iframe.src = '';
+            
+            // Restore body scrolling
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('resumeModal');
+            if (event.target == modal) {
+                closeResumeModal();
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeResumeModal();
+            }
+        });
+    </script>
 </body>
 </html>
