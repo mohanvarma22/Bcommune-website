@@ -160,7 +160,7 @@
                             <div class="detail-section">
                                 <p>Posted on: {{ project.created_at|date:"M d, Y" }}</p>
                             </div>
-                            <a href="{% url 'view_my_freelance_bid' project.id %}" class="place-bid-btn">View Bid</a>
+                            <a href="{% url 'view_freelance_bids' project.id %}" class="place-bid-btn">View Bid</a>
                         </div>
                     {% endfor %}
                 </div>

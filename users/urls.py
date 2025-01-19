@@ -55,6 +55,8 @@ urlpatterns = [
          views.place_freelance_bid, name='place_freelance_bid'),
     path('freelance-project/<int:project_id>/my-bid/', 
          views.view_my_freelance_bid, name='view_my_freelance_bid'),
+     path('company/dashboard/myportfolio/all_freelance_projects_company',views.all_freelance_projects_company,name='all_freelance_projects_company'),
+     path('company/dashboard/myportfolio/all_freelance_projects_company/freelance-project/<int:project_id>/bids/', views.view_freelance_bids, name='view_freelance_bids'),
 ]
 
 if settings.DEBUG:

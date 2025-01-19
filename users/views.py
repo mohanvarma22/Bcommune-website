@@ -680,13 +680,17 @@ def all_freelance_projects(request):
     return render(request, 'all_freelance_projects.html', {'freelance_projects': freelance_projects})
 
 
-@login_required
-def place_freelance_bid(request, project_id):
-    project = get_object_or_404(FreelanceProject, id=project_id)
-    if request.method == 'POST':
-        # Handle bid placement logic here, e.g., save bid details
-        return redirect('all_freelance_projects')  # Redirect back to projects page or another relevant page
-    return render(request, 'place_bid.html', {'project': project})
+def all_freelance_projects_company(request):
+    # Ensure the user is authenticated and fetch projects belonging to the logged-in user
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to login page if not authenticated
+
+    # Filter projects by the logged-in user (assuming company users are linked via the `user` field)
+    freelance_projects = FreelanceProject.objects.filter(user=request.user).order_by('-created_at')
+
+    return render(request, 'all_freelance_projects_company.html', {'freelance_projects': freelance_projects})
+
+
 
 @login_required
 def place_freelance_bid(request, project_id):
@@ -724,4 +728,14 @@ def view_my_freelance_bid(request, project_id):
     return render(request, 'view_my_freelance_bid.html', {
         'bid': bid,
         'project': project
+    })
+
+def view_freelance_bids(request, project_id):
+    # Fetch the project and its bids
+    project = get_object_or_404(FreelanceProject, id=project_id)
+    bids = FreelanceBid.objects.filter(project=project).order_by('-created_at')
+
+    return render(request, 'view_freelance_bids.html', {
+        'project': project,
+        'bids': bids,
     })

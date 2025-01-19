@@ -318,14 +318,14 @@
     </div>
 </section>
 <section class="portfolio-freelance">
-    <a href="{% url 'all_freelance_projects' %}">
+    <a href="{% url 'all_freelance_projects_company' %}">
         <h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Recent Freelance Projects</h2>
     </a>
     <div class="freelance-cards-container">
         {% if freelance_projects %}
             {% for project in freelance_projects|slice:":3" %}
                 {% if project.company == request.user.company %}  <!-- Assuming you have a company field in FreelanceProject model -->
-                    <a href="{% url 'all_freelance_projects' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
+                    <a href="{% url 'all_freelance_projects_company' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
                         <div class="freelance-card">
                             <div class="card-header">
                                 <div class="header-content">
