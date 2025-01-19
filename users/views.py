@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
@@ -739,3 +739,46 @@ def view_freelance_bids(request, project_id):
         'project': project,
         'bids': bids,
     })
+
+def individual_alljobs(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    # Fetch all jobs and order by most recent first
+    jobs = Job.objects.all().order_by('-posted_date')  # Assuming `posted_date` is the field for job posting date
+
+    # Get the job_id from URL parameters (if any)
+    selected_job_id = request.GET.get('job_id')
+
+    return render(request, 'individual_alljobs.html', {
+        'jobs': jobs,
+        'selected_job_id': selected_job_id
+    })
+
+def apply_job(request, job_id):
+    # Fetch the job object
+    job = get_object_or_404(Job, id=job_id)
+    
+    if request.method == 'POST':
+        # Get additional data if needed from the form
+        applicant_name = request.POST.get('name')
+        applicant_email = request.POST.get('email')
+        cover_letter = request.POST.get('cover_letter')
+        
+        # Create a job application
+        JobApplication.objects.create(
+            job=job,
+            user=request.user,  # Assuming the user is logged in
+            name=applicant_name,
+            email=applicant_email,
+            cover_letter=cover_letter
+        )
+        
+        # Show a success message
+        messages.success(request, 'You have successfully applied for the job!')
+        return redirect('individual_alljobs')  # Redirect to the jobs list page
+    
+    return render(request, 'apply_jobs.html', {'job': job})
+
+def job_success(request):
+    return render(request,'job_success.html')

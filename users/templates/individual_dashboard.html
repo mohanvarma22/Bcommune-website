@@ -64,23 +64,24 @@
 
             <!-- Jobs Section -->
             <section id="jobs">
-                <h3>Jobs</h3>
+                <a href="{% url 'individual_alljobs' %}"><h3>Jobs</h3></a>
                 <div class="cards-container">
                     {% for job in jobs %}
-                        <div class="card">
+                        <div class="card" onclick="window.location.href='{% url 'individual_alljobs' %}?job_id={{ job.id }}';" style="cursor: pointer;">
                             <h4>{{ job.title }}</h4>
                             <p><strong>Company:</strong> {{ job.company }}</p>
                             <p><strong>Location:</strong> {{ job.location }}</p>
                             <p>{{ job.description }}</p>
                             <p><strong>Requirements:</strong></p>
                             <p>{{ job.requirements }}</p>
-                            <p class="posted-date">Posted: {{ job.posted_date|date:"M d, Y" }}</p>
+                            <p class="posted-date">Posted: {{ job.posted_date|date:'M d, Y' }}</p>
                         </div>
                     {% empty %}
                         <p>No jobs available at the moment.</p>
                     {% endfor %}
                 </div>
             </section>
+            
 
             <!-- Freelance Section -->
             <!-- Freelance Section -->

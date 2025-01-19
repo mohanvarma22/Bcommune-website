@@ -240,3 +240,18 @@ class FreelanceBid(models.Model):
     
     def __str__(self):
         return f"Bid by {self.name} for {self.project.title}"
+    
+
+class JobApplication(models.Model):
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # To link with the user
+    job = models.ForeignKey('Job', on_delete=models.CASCADE)  # Link to the job being applied for
+    phone_number = models.CharField(max_length=15)
+    degree = models.CharField(max_length=50)
+    percentage = models.FloatField()
+    work_experience = models.PositiveIntegerField()  # Years of experience
+    resume = models.FileField(upload_to='resumes/')  # Upload resumes to "resumes/" directory
+    applied_at = models.DateTimeField(auto_now_add=True)  # Timestamp when applied
+
+    def __str__(self):
+        return f"{self.user.name} - {self.job.title}"

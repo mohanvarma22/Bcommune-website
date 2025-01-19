@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from .models import CustomUser, IndividualProfile, Bid, FreelanceProject, FreelanceBid
+from .models import CustomUser, IndividualProfile, Bid, FreelanceProject, FreelanceBid, JobApplication
 CustomUser = get_user_model()
 class CompanySignupForm(UserCreationForm):
     INDUSTRY_CHOICES = [
@@ -192,3 +192,20 @@ class FreelanceBidForm(forms.ModelForm):
             'previous_works': forms.Textarea(attrs={'rows': 6}),
             'execution_plan': forms.Textarea(attrs={'rows': 8}),
         }
+
+class JobApplicationForm(forms.ModelForm):
+    DEGREE_CHOICES = [
+        ('Bachelors', 'Bachelors'),
+        ('Masters', 'Masters'),
+        ('PhD', 'PhD'),
+        ('Diploma', 'Diploma'),
+    ]
+
+    degree = forms.ChoiceField(
+        choices=DEGREE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = JobApplication
+        fields = ['phone_number', 'degree', 'percentage', 'work_experience', 'resume']

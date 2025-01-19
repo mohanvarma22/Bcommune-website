@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Job</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+</head>
+<body>
+    {% include 'header2.html' %}
+
+    <div class="main-container">
+        <h2>Apply for {{ job.title }}</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" value="{{ user.first_name }} {{ user.last_name }}" class="form-control" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" value="{{ user.email }}" class="form-control" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                {{ form.phone_number }}
+            </div>
+
+            <div class="form-group">
+                <label for="degree">Degree</label>
+                {{ form.degree }}
+            </div>
+
+            <div class="form-group">
+                <label for="percentage">Percentage</label>
+                {{ form.percentage }}
+            </div>
+
+            <div class="form-group">
+                <label for="work_experience">Work Experience (Years)</label>
+                {{ form.work_experience }}
+            </div>
+
+            <div class="form-group">
+                <label for="resume">Resume</label>
+                {{ form.resume }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+        </form>
+    </div>
+</body>
+</html>
