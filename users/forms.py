@@ -195,15 +195,20 @@ class FreelanceBidForm(forms.ModelForm):
 
 class JobApplicationForm(forms.ModelForm):
     DEGREE_CHOICES = [
-        ('Bachelors', 'Bachelors'),
-        ('Masters', 'Masters'),
-        ('PhD', 'PhD'),
-        ('Diploma', 'Diploma'),
-    ]
+    ('bachelor', 'Bachelors'),
+    ('master', 'Masters'),
+    ('phd', 'PhD'),
+    ('diploma', 'Diploma'),
+]
 
     degree = forms.ChoiceField(
         choices=DEGREE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        required=True
     )
 
     skills = forms.CharField(
@@ -213,4 +218,4 @@ class JobApplicationForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ['phone_number', 'degree', 'percentage', 'work_experience', 'resume', 'skills']
+        fields = ['phone_number', 'email','degree', 'percentage', 'work_experience', 'resume', 'skills']

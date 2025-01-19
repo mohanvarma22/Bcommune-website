@@ -3,12 +3,13 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
+
 
 def logout_view(request):
     logout(request)
@@ -809,6 +810,7 @@ def apply_job(request, job_id):
             application.job = job
             application.user = request.user
             application.name = f"{request.user.first_name} {request.user.last_name}"  # Get the user's name
+            application.email = request.user.email
             application.save()
             job.applications_count = JobApplication.objects.filter(job=job).count()
             job.save()
@@ -825,13 +827,30 @@ def apply_job(request, job_id):
 def job_success(request):
     return render(request,'job_success.html')
 
+@login_required
 def view_applications(request, job_id):
-    job = get_object_or_404(Job, id=job_id)  # Get the specific job
-    applications = JobApplication.objects.filter(job=job)  # Fetch applications for this job
-    job.applications_count = applications.count()
-
+    # Get the job and verify ownership
+    job = get_object_or_404(Job, id=job_id, company_user=request.user)
+    applications = JobApplication.objects.filter(job=job)
+    
+    # Calculate match scores for each application
+    matcher = JobMatcher()
+    applications_with_scores = []
+    
+    for application in applications:
+        match_results = matcher.calculate_match(application, job)
+        applications_with_scores.append({
+            'application': application,
+            'match_score': match_results['overall_score'],
+            'detailed_scores': match_results['detailed_scores'],
+            'matching_skills': match_results['matching_skills'],
+            'missing_skills': match_results['missing_skills']
+        })
+    
+    # Sort applications by match score (highest first)
+    applications_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
+    
     return render(request, 'view_applications.html', {
         'job': job,
-        'applications': applications,
-        
+        'applications': applications_with_scores
     })

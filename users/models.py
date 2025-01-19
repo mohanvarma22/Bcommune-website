@@ -74,7 +74,12 @@ class Job(models.Model):
     # New fields for matching
     required_skills = models.TextField(help_text="Enter required skills separated by commas", default='')
     min_experience = models.PositiveIntegerField(default=0)
-    required_qualification = models.CharField(max_length=50, default='bachelor')
+    required_qualification = models.CharField(max_length=50, default='bachelor',choices=[
+        ('bachelor', 'Bachelors'),
+        ('master', 'Masters'),
+        ('phd', 'PhD'),
+        ('diploma', 'Diploma'),
+    ])
 
     def __str__(self):
         return f"{self.title} at {self.company}"
@@ -249,6 +254,7 @@ class JobApplication(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     job = models.ForeignKey('Job', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, default='Unknown')
+    email = models.EmailField(max_length=254) 
     phone_number = models.CharField(max_length=15)
     degree = models.CharField(max_length=50)
     percentage = models.FloatField()
@@ -318,14 +324,18 @@ class JobMatcher:
     def _calculate_experience_score(self, applicant_exp, required_exp):
         """Calculate experience match percentage"""
         if not required_exp:
-            return 100
-            
+            return 100  # No required experience, perfect match
+    
+    # Case when applicant's experience is much greater than required
+        if applicant_exp >= required_exp * 1.5:
+        # Penalize slightly, but ensure it doesn't drop too much
+            return max(50, 100 * (required_exp * 1.5) / applicant_exp)  # Set a minimum threshold of 50%
+    
+    # Case when applicant's experience is equal or slightly greater than required
         if applicant_exp >= required_exp:
-            if applicant_exp <= required_exp * 1.5:
-                return 100
-            else:
-                # Slightly penalize over-qualification
-                return 100 * (required_exp * 1.5) / applicant_exp
+            return 100
+    
+    # Case when applicant's experience is less than required
         return (applicant_exp / required_exp) * 100
     
     def _calculate_education_score(self, applicant_edu, required_edu):
@@ -333,10 +343,14 @@ class JobMatcher:
         education_levels = {
             'high school': 1,
             'diploma': 2,
+            'bachelors': 3,
             'bachelor': 3,
+            'masters': 4,
             'master': 4,
-            'phd': 5
+            'phd': 5,
+            'doctorate': 5
         }
+    
         
         applicant_level = education_levels.get(applicant_edu.lower(), 0)
         required_level = education_levels.get(required_edu.lower(), 0)
