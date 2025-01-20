@@ -195,7 +195,7 @@ class FreelanceBidForm(forms.ModelForm):
 
 class JobApplicationForm(forms.ModelForm):
     DEGREE_CHOICES = [
-    ('bachelor', 'Bachelors'),
+    ('bachelor', 'Bachelor\'s'),
     ('master', 'Masters'),
     ('phd', 'PhD'),
     ('diploma', 'Diploma'),

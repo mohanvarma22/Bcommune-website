@@ -3,12 +3,14 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import ValidationError
+from .filters import JobApplicationFilter
+import json
 
 
 def logout_view(request):
@@ -831,13 +833,19 @@ def job_success(request):
 def view_applications(request, job_id):
     # Get the job and verify ownership
     job = get_object_or_404(Job, id=job_id, company_user=request.user)
+    
+    # Get all applications for this job
     applications = JobApplication.objects.filter(job=job)
     
-    # Calculate match scores for each application
+    # Apply filters
+    application_filter = JobApplicationFilter(request.GET, queryset=applications)
+    filtered_applications = application_filter.qs
+    
+    # Calculate match scores for filtered applications
     matcher = JobMatcher()
     applications_with_scores = []
     
-    for application in applications:
+    for application in filtered_applications:
         match_results = matcher.calculate_match(application, job)
         applications_with_scores.append({
             'application': application,
@@ -850,7 +858,102 @@ def view_applications(request, job_id):
     # Sort applications by match score (highest first)
     applications_with_scores.sort(key=lambda x: x['match_score'], reverse=True)
     
-    return render(request, 'view_applications.html', {
+    # Add sorting by filter parameters if specified
+    sort_by = request.GET.get('sort_by')
+    if sort_by:
+        if sort_by == 'date':
+            applications_with_scores.sort(
+                key=lambda x: x['application'].applied_at, 
+                reverse=True
+            )
+        elif sort_by == 'education':
+            applications_with_scores.sort(
+                key=lambda x: x['application'].percentage, 
+                reverse=True
+            )
+        elif sort_by == 'experience':
+            applications_with_scores.sort(
+                key=lambda x: x['application'].work_experience, 
+                reverse=True
+            )
+    
+    context = {
         'job': job,
-        'applications': applications_with_scores
-    })
+        'applications': applications_with_scores,
+        'filter': application_filter,
+        'sort_by': sort_by,
+        'total_applications': applications.count(),
+        'filtered_count': len(applications_with_scores)
+    }
+    
+    return render(request, 'view_applications.html', context)
+
+@login_required
+def save_application(request, app_id):
+    if request.method != 'POST':
+        return JsonResponse({'message': "Invalid request method!"}, status=400)
+
+    job_application = get_object_or_404(JobApplication, id=app_id)
+    
+    # Parse the JSON data from request body
+    try:
+        data = json.loads(request.body)
+        category = data.get('category', 'Shortlisted')
+    except json.JSONDecodeError:
+        category = 'Shortlisted'
+
+    # Check if the application is already saved
+    saved_app = SavedApplication.objects.filter(
+        user=request.user, 
+        job_application=job_application
+    ).first()
+
+    if saved_app:
+        return JsonResponse({'message': "Application already saved!"})
+    
+    # Calculate match scores
+    matcher = JobMatcher()
+    match_result = matcher.calculate_match(job_application, job_application.job)
+
+    # Create new saved application
+    saved_app = SavedApplication.objects.create(
+        user=request.user,
+        job_application=job_application,
+        overall_match_score=match_result['overall_score'],
+        matching_skills=', '.join(match_result['matching_skills']),
+        missing_skills=', '.join(match_result['missing_skills']),
+        category=category
+    )
+
+    return JsonResponse({'message': "Application saved successfully!"})
+
+@login_required
+def saved_applications(request):
+    saved_apps = SavedApplication.objects.filter(user=request.user).order_by('-saved_at')
+    
+    # Filter by category if provided
+    category = request.GET.get('category')
+    if category:
+        saved_apps = saved_apps.filter(category=category)
+    
+    # Sorting by match score or saved time
+    sort_by = request.GET.get('sort', 'saved_at')
+    saved_apps = saved_apps.order_by(f"-{sort_by}")
+    
+    context = {
+        'saved_apps': saved_apps,
+        'categories': saved_apps.values_list('category', flat=True).distinct(),
+    }
+    return render(request, 'saved_applications.html', context)
+
+@login_required
+def update_category(request, saved_id):
+    if request.method == 'POST':
+        saved_app = get_object_or_404(SavedApplication, id=saved_id, user=request.user)
+        new_category = request.POST.get('category')
+        if new_category:
+            saved_app.category = new_category
+            saved_app.save()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'success'})
+    return redirect('saved_applications')

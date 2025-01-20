@@ -254,7 +254,7 @@ class JobApplication(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     job = models.ForeignKey('Job', on_delete=models.CASCADE)
     name = models.CharField(max_length=255, default='Unknown')
-    email = models.EmailField(max_length=254) 
+    email = models.EmailField(max_length=254, default='example@example.com') 
     phone_number = models.CharField(max_length=15)
     degree = models.CharField(max_length=50)
     percentage = models.FloatField()
@@ -388,3 +388,15 @@ class JobMatcher:
                 missing.append(job_skill)
         
         return missing
+    
+class SavedApplication(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    job_application = models.ForeignKey(JobApplication, on_delete=models.CASCADE)
+    overall_match_score = models.FloatField(default=0.0)
+    matching_skills = models.TextField(blank=True, help_text="Comma-separated matching skills")
+    missing_skills = models.TextField(blank=True, help_text="Comma-separated missing skills")
+    category = models.CharField(max_length=100, default="Shortlisted")
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} saved {self.job_application.job.title}"

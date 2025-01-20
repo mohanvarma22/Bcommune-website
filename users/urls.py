@@ -61,6 +61,9 @@ urlpatterns = [
      path('individual/dashboard/individual_alljobs/apply_job/<int:job_id>/', views.apply_job, name='apply_job'),
      path('job_success/',views.job_success,name="job_success"),
      path('company/dashboard/myportfolio/all_jobs/view_applications/<int:job_id>/',views.view_applications,name='view_applications'),
+     path('save-application/<int:app_id>/', views.save_application, name='save_application'),
+     path('saved-applications/', views.saved_applications, name='saved_applications'),
+     path('update-category/<int:saved_id>/', views.update_category, name='update_category'),
 ]
 
 if settings.DEBUG:
