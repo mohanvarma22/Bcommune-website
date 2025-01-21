@@ -64,6 +64,8 @@ urlpatterns = [
      path('save-application/<int:app_id>/', views.save_application, name='save_application'),
      path('saved-applications/', views.saved_applications, name='saved_applications'),
      path('update-category/<int:saved_id>/', views.update_category, name='update_category'),
+     path('like/<int:idea_id>/', views.like_idea, name='like_idea'),
+     path('dislike/<int:idea_id>/', views.dislike_idea, name='dislike_idea'),
 ]
 
 if settings.DEBUG:

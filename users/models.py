@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings 
 from django.contrib.auth import get_user_model
+from pydantic import ValidationError
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
@@ -61,6 +62,33 @@ class Idea(models.Model):
     email = models.EmailField(null=True, blank=True)
     def __str__(self):
         return self.title
+    
+    @property
+    def likes(self):
+        return self.likedislike_set.filter(like=True).count()
+
+    @property
+    def dislikes(self):
+        return self.likedislike_set.filter(dislike=True).count()
+    
+    def get_like_status(self, user):
+        """Get the like status for a specific user"""
+        if not user.is_authenticated:
+            return None
+        try:
+            like_obj = self.likedislike_set.get(user=user)
+            if like_obj.like:
+                return 'liked'
+            elif like_obj.dislike:
+                return 'disliked'
+        except LikeDislike.DoesNotExist:
+            pass
+        return None
+
+    @property
+    def total_reactions(self):
+        """Get total number of reactions"""
+        return self.likes + self.dislikes
     
 class Job(models.Model):
     title = models.CharField(max_length=200)
@@ -400,3 +428,24 @@ class SavedApplication(models.Model):
 
     def __str__(self):
         return f"{self.user.username} saved {self.job_application.job.title}"
+    
+class LikeDislike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE)
+    like = models.BooleanField(default=False)
+    dislike = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'idea')  # Ensures a user can only like or dislike once
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.idea.title} ({'Like' if self.like else 'Dislike'})"
+    
+    def clean(self):
+        """Ensure only one of like or dislike is True"""
+        if self.like and self.dislike:
+            raise ValidationError("Cannot like and dislike simultaneously")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

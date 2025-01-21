@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication,LikeDislike
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
@@ -289,8 +289,11 @@ def explore_all_ideas(request):
 
 def idea_detail(request, idea_id):
     idea = get_object_or_404(Idea, id=idea_id)
-    return render(request, 'idea_detail.html', {'idea': idea})
-
+    context = {
+        'idea': idea,
+        'user_reaction': idea.get_like_status(request.user) if request.user.is_authenticated else None
+    }
+    return render(request, 'idea_detail.html', context)
 
 def edit_job(request, job_id):
     job = get_object_or_404(Job, id=job_id, company_user=request.user)
@@ -965,3 +968,43 @@ def update_category(request, saved_id):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'status': 'success'})
     return redirect('saved_applications')
+
+def like_idea(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id)
+    user = request.user
+
+    # Check if user already liked or disliked this idea
+    obj, created = LikeDislike.objects.get_or_create(user=user, idea=idea)
+    
+    # If the user already liked, toggle off. If disliked, toggle to like.
+    if obj.dislike:
+        obj.dislike = False
+        obj.like = True
+    elif obj.like:
+        obj.like = False
+    else:
+        obj.like = True
+
+    obj.save()
+    
+    return JsonResponse({'likes': idea.likes,'dislikes': idea.dislikes,'message': 'Like toggled successfully!'}, status=200)
+
+def dislike_idea(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id)
+    user = request.user
+
+    # Check if user already liked or disliked this idea
+    obj, created = LikeDislike.objects.get_or_create(user=user, idea=idea)
+    
+    # If the user already disliked, toggle off. If liked, toggle to dislike.
+    if obj.like:
+        obj.like = False
+        obj.dislike = True
+    elif obj.dislike:
+        obj.dislike = False
+    else:
+        obj.dislike = True
+
+    obj.save()
+    
+    return JsonResponse({'likes': idea.likes,'dislikes': idea.dislikes,'message': 'Dislike toggled successfully!'}, status=200)
