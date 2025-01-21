@@ -14,8 +14,14 @@ import json
 
 
 def logout_view(request):
-    logout(request)
-    return redirect('company_login')
+    if request.user.is_authenticated:
+        if request.user.user_type == 'individual':
+            logout(request)
+            return redirect('individual_login')  # Change 'individual_login' to the actual URL name for individual login
+        elif request.user.user_type == 'company':
+            logout(request)
+            return redirect('company_login')  # Change 'company_login' to the actual URL name for company login
+    return redirect('home') 
 
 def home(request):
     return render(request, 'home.html')
