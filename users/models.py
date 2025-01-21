@@ -58,7 +58,7 @@ class Idea(models.Model):
     video = models.FileField(upload_to='idea_videos/', blank=True, null=True)
     team_info = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    email = models.EmailField(null=True, blank=True)
     def __str__(self):
         return self.title
     

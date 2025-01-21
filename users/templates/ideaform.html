@@ -112,6 +112,7 @@ form .submit-btn:hover {
             <form id="ideaForm" method="POST" enctype="multipart/form-data" class="idea-form">
                 {% csrf_token %}
                 <!-- Top Section -->
+                <input type="hidden" name="user_email" value="{{ user.email }}">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="title">Title</label>

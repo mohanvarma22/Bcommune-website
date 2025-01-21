@@ -1,4 +1,4 @@
-{% load static %}
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,7 +101,7 @@
 
             {% if idea.photo %}
                 <div class="idea-section">
-                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" style="width: 100%;height:100%"; border-radius: 10px;">
+                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" style="width: 100%; height: 100%; border-radius: 10px;">
                 </div>
             {% endif %}
 
@@ -156,7 +156,13 @@
                 {% endif %}
 
                 <div class="idea-actions">
-                    <button class="fund-btn">Fund this Idea</button>
+                    <!-- Show Interest button -->
+                    <a href="mailto:{{ idea.email }}?subject=Interest in {{ idea.title }}&body=Hello,%0D%0A%0D%0AI am interested in your idea titled '{{ idea.title }}'.%0D%0A%0D%0AHere are some questions I have:%0D%0A%0D%0A(Your Message Here)%0D%0A%0D%0AThank you!" class="fund-btn">
+                        Show Interest
+                    </a>
+                    
+
+                    <!-- Back to Ideas button -->
                     <a href="{% url 'explore_all_ideas' %}" class="back-btn">Back to Ideas</a>
                 </div>
             </div>

@@ -168,6 +168,7 @@ def submit_idea(request):
         photo = request.FILES.get('photo')
         video = request.FILES.get('video')
         team_info = request.POST.get('team_info')
+        user_email = request.POST.get('user_email')
 
         # Save to database
         idea = Idea(
@@ -183,7 +184,8 @@ def submit_idea(request):
             category=category,
             photo=photo,
             video=video,
-            team_info=team_info
+            team_info=team_info,
+            email = user_email,
         )
         idea.save()
 
