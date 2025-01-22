@@ -67,7 +67,9 @@ urlpatterns = [
      path('like/<int:idea_id>/', views.like_idea, name='like_idea'),
      path('core/', views.core_view, name='core'),  # Core page with the button
      path('coreform/', views.core_form_view, name='coreform'),
+     path('opportunity/<int:pk>/', views.opportunity_detail, name='opportunity_detail'),
      path('dislike/<int:idea_id>/', views.dislike_idea, name='dislike_idea'),
+     path('delete_opportunity/<int:pk>/', views.delete_opportunity, name='delete_opportunity'),
 ]
 
 if settings.DEBUG:

@@ -226,11 +226,13 @@ class JobApplicationForm(forms.ModelForm):
 
 from .models import CoreOpportunity
 
+
 class OpportunityForm(forms.ModelForm):
     class Meta:
         model = CoreOpportunity
-        fields = ['opportunity_title', 'role_details', 'responsibilities', 'key_objectives', 
-                  'expertise', 'benefits', 'opportunity_type', 'industry', 'description', 
-                  'stage', 'company_mission', 'requirements', 'compensation', 
-                  'equity_percentage', 'other_compensation', 'salary', 'experience', 
-                  'location', 'location_details', 'commitment', 'future_plans', 'terms', 'nda']
+        fields = [
+            'opportunity_title', 'role_details', 'responsibilities', 'key_objectives', 
+            'expertise', 'benefits', 'opportunity_type', 'industry', 'description', 
+            'stage', 'company_mission', 'requirements', 'experience', 
+            'commitment', 'future_plans', 'terms', 'nda'
+        ]

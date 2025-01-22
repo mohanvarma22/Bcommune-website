@@ -37,6 +37,23 @@
             border: 1px solid #444;
             border-radius: 5px;
             background-color: #34495e;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .opportunity-item:hover {
+            transform: scale(1.02);
+        }
+        .details-button {
+            margin-top: 10px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .details-button:hover {
+            background-color: #c0392b;
         }
         h2 {
             color: #ecf0f1;
@@ -48,23 +65,19 @@
     <h1>Welcome to the Core Page</h1>
     <p>Click the button below to go to the opportunity form.</p>
     
-    <!-- Button linking to coreform.html -->
     <a href="{% url 'coreform' %}">
         <button>Post an Opportunity</button>
     </a>
 
-    <!-- Portfolio Section: Opportunities posted by the individual -->
     <div class="section">
         <h2>Your Portfolio</h2>
         {% if individual_opportunities %}
             <div>
                 {% for opportunity in individual_opportunities %}
-                    <div class="opportunity-item">
+                    <div class="opportunity-item" onclick="window.location.href='{% url 'opportunity_detail' opportunity.id %}'">
                         <h3>{{ opportunity.opportunity_title }}</h3>
-                        <p>{{ opportunity.description }}</p>
-                        <p><strong>Industry:</strong> {{ opportunity.industry }}</p>
-                        <p><strong>Stage:</strong> {{ opportunity.stage }}</p>
-                        <p><strong>Commitment:</strong> {{ opportunity.commitment }}</p>
+                        <p>{{ opportunity.description|truncatechars:100 }}</p>
+                        <a href="{% url 'opportunity_detail' opportunity.id %}" class="details-button">View Full Details</a>
                     </div>
                 {% endfor %}
             </div>
@@ -73,18 +86,15 @@
         {% endif %}
     </div>
 
-    <!-- Opportunities Section: Opportunities posted by other companies -->
     <div class="section">
         <h2>Opportunities from Other Companies</h2>
         {% if other_opportunities %}
             <div>
                 {% for opportunity in other_opportunities %}
-                    <div class="opportunity-item">
+                    <div class="opportunity-item" onclick="window.location.href='{% url 'opportunity_detail' opportunity.id %}'">
                         <h3>{{ opportunity.opportunity_title }}</h3>
-                        <p>{{ opportunity.description }}</p>
-                        <p><strong>Industry:</strong> {{ opportunity.industry }}</p>
-                        <p><strong>Stage:</strong> {{ opportunity.stage }}</p>
-                        <p><strong>Commitment:</strong> {{ opportunity.commitment }}</p>
+                        <p>{{ opportunity.description|truncatechars:100 }}</p>
+                        <a href="{% url 'opportunity_detail' opportunity.id %}" class="details-button">View Full Details</a>
                     </div>
                 {% endfor %}
             </div>

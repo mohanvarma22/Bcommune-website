@@ -488,9 +488,9 @@ class LikeDislike(models.Model):
         self.clean()
         super().save(*args, **kwargs)
 
-from django.db import models
 
 class CoreOpportunity(models.Model):
+    # Define dropdown options
     OPPORTUNITY_TYPES = [
         ('Co-Founder Role', 'Co-Founder Role'),
         ('Advisor', 'Advisor'),
@@ -498,11 +498,30 @@ class CoreOpportunity(models.Model):
         ('Team Member', 'Team Member'),
         ('Other', 'Other'),
     ]
-    
+
     COMPENSATION_TYPES = [
         ('Equity-Based', 'Equity-Based'),
         ('Paid Opportunity', 'Paid Opportunity'),
         ('Other', 'Other'),
+    ]
+
+    STAGE_TYPES = [
+        ('Idea', 'Idea'),
+        ('Building', 'Building'),
+        ('MVP', 'MVP'),
+        ('Funded', 'Funded'),
+    ]
+
+    LOCATION_TYPES = [
+        ('Remote', 'Remote'),
+        ('Hybrid', 'Hybrid'),
+        ('Onsite', 'Onsite'),
+    ]
+
+    COMMITMENT_TYPES = [
+        ('Full-Time', 'Full-Time'),
+        ('Part-Time', 'Part-Time'),
+        ('Intern', 'Intern'),
     ]
 
     opportunity_title = models.CharField(max_length=200)
@@ -514,19 +533,18 @@ class CoreOpportunity(models.Model):
     opportunity_type = models.CharField(max_length=50, choices=OPPORTUNITY_TYPES)
     industry = models.CharField(max_length=100)
     description = models.TextField()
-    stage = models.CharField(max_length=50)
+    stage = models.CharField(max_length=50, choices=STAGE_TYPES)
     company_mission = models.TextField()
     requirements = models.CharField(max_length=200)
     compensation = models.CharField(max_length=50, choices=COMPENSATION_TYPES)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=True, blank=True)
-    # Fields that can be nullable or conditional
-    equity_percentage = models.FloatField(null=True, blank=True)  # Only for 'Equity-Based' compensation
-    other_compensation = models.CharField(max_length=200, null=True, blank=True)  # Only for 'Other' compensation
-    salary = models.CharField(max_length=100, null=True, blank=True)  # Only for 'Paid Opportunity'
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    equity_percentage = models.FloatField(null=True, blank=True)
+    other_compensation = models.CharField(max_length=200, null=True, blank=True)
+    salary = models.CharField(max_length=100, null=True, blank=True)
     experience = models.CharField(max_length=100, null=True, blank=True)
-    location = models.CharField(max_length=50, null=True, blank=True)  # Nullable so that it doesn't break existing rows
-    location_details = models.CharField(max_length=200, null=True, blank=True)  # Nullable for location-specific details
-    commitment = models.CharField(max_length=50)
+    location = models.CharField(max_length=50, choices=LOCATION_TYPES, null=True, blank=True)
+    location_details = models.CharField(max_length=200, null=True, blank=True)
+    commitment = models.CharField(max_length=50, choices=COMMITMENT_TYPES)
     future_plans = models.TextField()
     terms = models.BooleanField(default=False)
     nda = models.BooleanField(default=False)

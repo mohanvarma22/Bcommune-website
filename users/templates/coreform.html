@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,15 +38,6 @@
             resize: vertical;
         }
 
-        .checkbox-container {
-            display: flex; /* Use flexbox for better control over layout */
-            align-items: center; /* Vertically center the elements */
-        }
-
-        .checkbox-container input {
-            margin-right: 10px;
-        }
-        
         button {
             display: block;
             width: 100%;
@@ -60,31 +52,30 @@
             background-color: #0056b3;
         }
 
-        /* Style for the extra fields like location, salary, and mission */
         .conditional-field {
             display: none;
         }
+
         .messages {
-    margin-bottom: 20px;
-}
+            margin-bottom: 20px;
+        }
 
-.message {
-    padding: 10px;
-    border-radius: 4px;
-    margin: 10px 0;
-    text-align: center;
-}
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
 
-.message.success {
-    background-color: #28a745;
-    color: white;
-}
+        .message.success {
+            background-color: #28a745;
+            color: white;
+        }
 
-.message.error {
-    background-color: #dc3545;
-    color: white;
-}
-
+        .message.error {
+            background-color: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -98,45 +89,97 @@
     </div>
     {% endif %}
 
-<form action="#" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Post Opportunity</button>
-</form>
+    <form action="#" method="post" onsubmit="return validateForm()">
+        {% csrf_token %}
+        {{ form.as_p }}
 
-<script>
-    // Toggle compensation-related input fields based on selected compensation model
-    function toggleCompensationFields() {
-        var compensationType = document.getElementById("compensation").value;
+        <!-- Compensation Type Dropdown -->
+        <label for="compensation">Compensation</label>
+        <select id="compensation" name="compensation" onchange="toggleCompensationFields()">
+            <option value="">Select Compensation Type</option>
+            <option value="Equity-Based">Equity-Based</option>
+            <option value="Paid Opportunity">Paid Opportunity</option>
+            <option value="Other">Other</option>
+        </select>
 
-        // Hide all fields initially
-        document.getElementById("equity-percentage-field").style.display = "none";
-        document.getElementById("other-compensation-field").style.display = "none";
-        document.getElementById("salary-range").style.display = "none";
+        <!-- Equity Percentage Field -->
+        <div id="equity-percentage-field" class="conditional-field">
+            <label for="equity-percentage">Equity Percentage</label>
+            <input type="text" id="equity-percentage" name="equity_percentage" placeholder="Enter equity percentage">
+        </div>
 
-        // Show the appropriate field based on the selected compensation model
-        if (compensationType === "Equity-Based") {
-            document.getElementById("equity-percentage-field").style.display = "block";
-        } else if (compensationType === "Other") {
-            document.getElementById("other-compensation-field").style.display = "block";
-        } else if (compensationType === "Paid Opportunity") {
-            document.getElementById("salary-range").style.display = "block";
+        <!-- Other Compensation Field -->
+        <div id="other-compensation-field" class="conditional-field">
+            <label for="other-compensation">Other Compensation</label>
+            <input type="text" id="other-compensation" name="other_compensation" placeholder="Describe other compensation">
+        </div>
+
+        <!-- Salary Range Field -->
+        <div id="salary-range" class="conditional-field">
+            <label for="salary">Salary</label>
+            <input type="text" id="salary" name="salary" placeholder="Enter salary range">
+        </div>
+
+        <!-- Location Preference Dropdown -->
+        <label for="location">Location</label>
+        <select id="location" name="location" onchange="toggleLocationField()">
+            <option value="">Select Location Type</option>
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Onsite">Onsite</option>
+        </select>
+
+        <!-- Location Field -->
+        <div id="location-field" class="conditional-field">
+            <label for="location-details">Location Details</label>
+            <input type="text" id="location-details" name="location_details" placeholder="Enter location details">
+        </div>
+
+        <button type="submit">Post Opportunity</button>
+    </form>
+
+    <script>
+        // Toggle compensation-related input fields based on selected compensation type
+        function toggleCompensationFields() {
+            var compensationType = document.getElementById("compensation").value;
+
+            document.getElementById("equity-percentage-field").style.display = "none";
+            document.getElementById("other-compensation-field").style.display = "none";
+            document.getElementById("salary-range").style.display = "none";
+
+            if (compensationType === "Equity-Based") {
+                document.getElementById("equity-percentage-field").style.display = "block";
+            } else if (compensationType === "Other") {
+                document.getElementById("other-compensation-field").style.display = "block";
+            } else if (compensationType === "Paid Opportunity") {
+                document.getElementById("salary-range").style.display = "block";
+            }
         }
-    }
-    // Toggle location field visibility based on location preference
-function toggleLocationField() {
-    var locationType = document.getElementById("location").value;
-    var locationField = document.getElementById("location-field");
 
-    // Show or hide location field based on selected location preference
-    if (locationType === "In-Person" || locationType === "Hybrid") {
-        locationField.style.display = "block";
-    } else {
-        locationField.style.display = "none";
-    }
-}
+        // Toggle location field visibility based on location preference
+        function toggleLocationField() {
+            var locationType = document.getElementById("location").value;
+            var locationField = document.getElementById("location-field");
 
-</script>
+            locationField.style.display = (locationType === "Onsite" || locationType === "Hybrid") ? "block" : "none";
+        }
 
+        // Simple validation to ensure required fields are filled
+        function validateForm() {
+            var compensationType = document.getElementById("compensation").value;
+            if (!compensationType) {
+                alert("Please select a compensation type.");
+                return false;
+            }
+
+            var locationType = document.getElementById("location").value;
+            if (!locationType) {
+                alert("Please select a location type.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>

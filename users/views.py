@@ -1055,15 +1055,41 @@ def core_form_view(request):
     if request.method == 'POST':
         form = OpportunityForm(request.POST)
         if form.is_valid():
-            # Assign the current user to the `user` field before saving
             opportunity = form.save(commit=False)
             opportunity.user = request.user
+            
+            # Handle compensation-related fields
+            opportunity.compensation = request.POST.get('compensation')
+            if opportunity.compensation == 'Equity-Based':
+                opportunity.equity_percentage = request.POST.get('equity_percentage')
+            elif opportunity.compensation == 'Paid Opportunity':
+                opportunity.salary = request.POST.get('salary')
+            elif opportunity.compensation == 'Other':
+                opportunity.other_compensation = request.POST.get('other_compensation')
+            
+            # Handle location-related fields
+            opportunity.location = request.POST.get('location')
+            if opportunity.location in ['Onsite', 'Hybrid']:
+                opportunity.location_details = request.POST.get('location_details')
+            
             opportunity.save()
             messages.success(request, "Your opportunity has been posted successfully!")
             return redirect('core')
-        else:
-            messages.error(request, "There was an error in your submission. Please correct the highlighted fields.")
     else:
         form = OpportunityForm()
 
     return render(request, 'coreform.html', {'form': form})
+def opportunity_detail(request, pk):
+    opportunity = get_object_or_404(CoreOpportunity, pk=pk)
+    return render(request, 'opportunity_detail.html', {'opportunity': opportunity})
+
+def delete_opportunity(request, pk):
+    opportunity = get_object_or_404(CoreOpportunity, pk=pk)
+
+    if opportunity.user == request.user:
+        opportunity.delete()
+        messages.success(request, "Opportunity deleted successfully!")
+    else:
+        messages.error(request, "You are not authorized to delete this opportunity.")
+
+    return redirect('core') 
