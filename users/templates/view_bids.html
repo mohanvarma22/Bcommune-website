@@ -5,6 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bids for {{ project.title }}</title>
     <style>
+        .compare-controls {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .compare-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+        }
+
+        .compare-btn:hover {
+            background: #218838;
+        }
+
+        .compare-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .bid-checkbox {
+            display: none;
+            margin-right: 10px;
+        }
+
+        .bid-checkbox.show {
+            display: block;
+        }
+
+        .comparison-view {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comparison-view.active {
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .checkbox-wrapper {
+            display: none;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .checkbox-wrapper.show {
+            display: flex;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .cancel-compare {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cancel-compare:hover {
+            background: #c82333;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
@@ -215,13 +321,34 @@
                 <span class="bid-meta-item">📊 <strong>Total Bids:</strong> {{ bids|length }}</span>
             </div>
         </div>
+        <div class="compare-controls">
+            <button onclick="toggleCompareMode()" class="compare-btn" id="toggleCompare">Compare Bids</button>
+            <div>
+                <button onclick="compareBids()" class="compare-btn" id="compareSelected" style="display: none;">Compare Selected</button>
+                <button onclick="cancelCompare()" class="cancel-compare" id="cancelCompare" style="display: none;">Cancel</button>
+            </div>
+        </div>
+
+        <div id="comparisonView" class="comparison-view">
+            <h2>Bid Comparison</h2>
+            <div id="comparisonContent"></div>
+        </div>
 
         <div class="bids-section">
             {% if bids %}
                 {% for bid in bids %}
-                    <div class="bid-item">
+                    <div class="bid-item" data-bid-id="{{ bid.id }}">
                         <div class="bid-summary" onclick="toggleBid(this)">
                             <div class="bid-preview">
+                                <div class="checkbox-wrapper">
+                                    <input type="checkbox" 
+                                           class="custom-checkbox" 
+                                           onclick="event.stopPropagation()"
+                                           data-company="{{ bid.bidder.company_name }}"
+                                           data-amount="{{ bid.amount }}"
+                                           data-timeline="{{ bid.estimated_timeline }}"
+                                           data-industry="{{ bid.bidder.industry }}">
+                                </div>
                                 <span class="bid-meta-item">🏢 <strong>Company:</strong> {{ bid.bidder.company_name }}</span>
                                 <span class="bid-meta-item">💰 <strong>Amount:</strong> ${{ bid.amount|floatformat:2 }}</span>
                                 <span class="bid-meta-item">⏱️ <strong>Timeline:</strong> {{ bid.estimated_timeline }} days</span>
@@ -241,7 +368,7 @@
                                     <p>{{ bid.company_profile|linebreaks }}</p>
                                 {% endif %}
                             </div>
-
+        
                             <div class="bid-section">
                                 <h3 class="section-title">Bid Details</h3>
                                 <div class="bid-meta">
@@ -254,7 +381,7 @@
                                     <p>{{ bid.payment_terms|linebreaks }}</p>
                                 {% endif %}
                             </div>
-
+        
                             <div class="bid-section">
                                 <h3 class="section-title">Project Approach</h3>
                                 {% if bid.project_approach %}
@@ -265,7 +392,7 @@
                                     <p>{{ bid.team_resources|linebreaks }}</p>
                                 {% endif %}
                             </div>
-
+        
                             {% if bid.portfolio_links or bid.client_testimonials %}
                                 <div class="bid-section">
                                     <h3 class="section-title">Portfolio & References</h3>
@@ -279,7 +406,7 @@
                                     {% endif %}
                                 </div>
                             {% endif %}
-
+        
                             {% if bid.proposal_document or bid.certifications %}
                                 <div class="bid-section">
                                     <h3 class="section-title">Documents</h3>
@@ -297,7 +424,7 @@
                                     </div>
                                 </div>
                             {% endif %}
-
+        
                             {% if bid.custom_fields %}
                                 <div class="bid-section">
                                     <h3 class="section-title">Additional Information</h3>
@@ -325,6 +452,105 @@
     </div>
 
     <script>
+        function toggleCompareMode() {
+            const checkboxWrappers = document.querySelectorAll('.checkbox-wrapper');
+            const toggleBtn = document.getElementById('toggleCompare');
+            const compareBtn = document.getElementById('compareSelected');
+            const cancelBtn = document.getElementById('cancelCompare');
+            
+            if (checkboxWrappers[0].classList.contains('show')) {
+                // Exit compare mode
+                cancelCompare();
+            } else {
+                // Enter compare mode
+                checkboxWrappers.forEach(wrapper => wrapper.classList.add('show'));
+                toggleBtn.style.display = 'none';
+                compareBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+                
+                // Disable bid expansion while in compare mode
+                document.querySelectorAll('.bid-summary').forEach(summary => {
+                    summary.style.cursor = 'default';
+                    summary.removeAttribute('onclick');
+                });
+            }
+        }
+
+        function cancelCompare() {
+            const checkboxWrappers = document.querySelectorAll('.checkbox-wrapper');
+            const checkboxes = document.querySelectorAll('.custom-checkbox');
+            const toggleBtn = document.getElementById('toggleCompare');
+            const compareBtn = document.getElementById('compareSelected');
+            const cancelBtn = document.getElementById('cancelCompare');
+            const comparisonView = document.getElementById('comparisonView');
+            
+            checkboxWrappers.forEach(wrapper => wrapper.classList.remove('show'));
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+            toggleBtn.style.display = 'inline-block';
+            compareBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            comparisonView.classList.remove('active');
+            
+            // Re-enable bid expansion
+            document.querySelectorAll('.bid-summary').forEach(summary => {
+                summary.style.cursor = 'pointer';
+                summary.setAttribute('onclick', 'toggleBid(this)');
+            });
+        }
+
+        function compareBids() {
+            const selectedBids = [];
+            document.querySelectorAll('.custom-checkbox').forEach((checkbox, index) => {
+                if (checkbox.checked) {
+                    const bidItem = checkbox.closest('.bid-item');
+                    const bidData = {
+                        company: bidItem.querySelector('.bid-meta-item strong').nextSibling.textContent.trim(),
+                        amount: bidItem.querySelector('.bid-meta-item:nth-child(2)').textContent.trim(),
+                        timeline: bidItem.querySelector('.bid-meta-item:nth-child(3)').textContent.trim(),
+                        industry: bidItem.querySelector('.bid-details .bid-meta-item:first-child').textContent.trim(),
+                        approach: bidItem.querySelector('.bid-section:nth-child(3) p')?.textContent.trim() || 'Not provided'
+                    };
+                    selectedBids.push(bidData);
+                }
+            });
+
+            if (selectedBids.length < 2) {
+                alert('Please select at least 2 bids to compare');
+                return;
+            }
+
+            const comparisonView = document.getElementById('comparisonView');
+            const comparisonContent = document.getElementById('comparisonContent');
+            
+            // Create comparison table
+            let tableHTML = `
+                <table class="comparison-table">
+                    <tr>
+                        <th>Criteria</th>
+                        ${selectedBids.map(bid => `<th>${bid.company}</th>`).join('')}
+                    </tr>
+                    <tr>
+                        <td><strong>Bid Amount</strong></td>
+                        ${selectedBids.map(bid => `<td>${bid.amount}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td><strong>Timeline</strong></td>
+                        ${selectedBids.map(bid => `<td>${bid.timeline}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td><strong>Industry</strong></td>
+                        ${selectedBids.map(bid => `<td>${bid.industry}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td><strong>Project Approach</strong></td>
+                        ${selectedBids.map(bid => `<td>${bid.approach}</td>`).join('')}
+                    </tr>
+                </table>
+            `;
+
+            comparisonContent.innerHTML = tableHTML;
+            comparisonView.classList.add('active');
+        }
         function toggleBid(element) {
             const details = element.nextElementSibling;
             const button = element.querySelector('.expand-btn');
