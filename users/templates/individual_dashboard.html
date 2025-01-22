@@ -74,6 +74,112 @@
         .button:hover {
             background-color: #0056b3;
         } */
+/* Explore Ideas Section */
+.idea-explore {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.idea-explore .section-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.idea-explore .section-heading .bi-arrow-right-circle {
+    margin-left: 10px;
+    color: #0073e6;
+    transition: color 0.3s ease;
+}
+
+.idea-explore .section-heading:hover .bi-arrow-right-circle {
+    color: #005bb5;
+}
+
+.idea-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    justify-items: center;
+    padding: 20px;
+}
+
+.idea-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 300px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.idea-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.idea-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 2px solid #f1f1f1;
+}
+
+.idea-content {
+    padding: 20px;
+}
+
+.idea-content h3 {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.idea-content p {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.idea-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.idea-meta .category {
+    font-weight: bold;
+    color: #0073e6;
+}
+
+.idea-meta .fund {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.view-details-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #0073e6;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background-color: #005bb5;
+}
 
     </style>
     
@@ -88,35 +194,37 @@
         <!-- Main Content -->
         <div class="content">
             <h2>My Dashboard</h2>
-            
-
-            <!-- Ideas Section -->
-            <section id="ideas">
-                <h3>Ideas </h3>
-                <div class="cards-container">
+            <section class="idea-explore">
+                <h2>
+                  <a href="{% url 'explore_all_ideas_individual' %}" class="section-heading">
+                    Explore Ideas
+                    <i class="bi bi-arrow-right-circle" style="font-size: 1.5rem;"></i>
+                  </a>
+                </h2>
+                <div class="idea-cards">
                     {% for idea in ideas %}
-                        <div class="card">
-                            <h4>{{ idea.title }}</h4>
-                            <p>{{ idea.brief_description }}</p>
-                            <p><strong>Problem:</strong> {{ idea.problem_statement }}</p>
-                            <p><strong>Solution:</strong> {{ idea.solution }}</p>
-                            <p><strong>Required Fund:</strong> ₹{{ idea.fund_required }}</p>
-                            <p><strong>Category:</strong> {{ idea.category }}</p>
-                            <!-- {% if idea.photo %}
-                                <img src="{{ idea.photo.url }}" alt="Idea Photo">
+                        <div class="idea-card">
+                            {% if idea.photo %}
+                                <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" style="height: 180px;width: 180px;">
                             {% endif %}
-                            {% if idea.video %}
-                                <video controls>
-                                    <source src="{{ idea.video.url }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
-                            {% endif %} -->
+                            <div class="idea-content">
+                                <h3>{{ idea.title }}</h3>
+                                <p>{{ idea.brief_description|truncatechars:100 }}</p>
+                                <div class="idea-meta">
+                                    <span class="category">{{ idea.category }}</span>
+                                    <span class="fund">${{ idea.fund }}</span>
+                                </div>
+                                <br>
+                                <a href="{% url 'idea_detail_individual' idea.id %}" class="view-details-btn">View Details</a>
+                            </div>
                         </div>
                     {% empty %}
-                        <p>No ideas submitted yet.</p>
+                        <p>No ideas available to display.</p>
                     {% endfor %}
                 </div>
             </section>
+
+            
 
             <!-- Jobs Section -->
             <section id="jobs">

@@ -71,6 +71,10 @@ urlpatterns = [
      path('dislike/<int:idea_id>/', views.dislike_idea, name='dislike_idea'),
      path('delete_opportunity/<int:pk>/', views.delete_opportunity, name='delete_opportunity'),
      path('resume-database/', views.resume_database, name='resume_database'),
+     path('explore-ideas-individual',views.explore_all_ideas_individual,name='explore_all_ideas_individual'),
+     path('idea-detail-individual/<int:idea_id>/', views.idea_detail_individual, name='idea_detail_individual'),
+     path('myjobs-individual',views.myjobs_individual,name='myjobs_individual'),
+     path('delete-idea/<int:idea_id>/', views.delete_idea, name='delete_idea'),
 ]
 
 if settings.DEBUG:

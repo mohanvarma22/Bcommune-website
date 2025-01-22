@@ -200,7 +200,8 @@ def submit_idea(request):
 
 
 def ideas_and_invest(request):
-    return render(request, 'ideasandinvest.html')
+    user_ideas = Idea.objects.filter(email=request.user.email).order_by('-created_at')
+    return render(request, 'ideasandinvest.html', {'user_ideas': user_ideas})
 
 
 
@@ -1157,3 +1158,32 @@ def resume_database(request):
         profiles = profiles.filter(availability_status=filters['availability_status'])
 
     return render(request, 'resume_database.html', {'profiles': profiles, 'filters': filters})
+
+def explore_all_ideas_individual(request):
+    ideas = Idea.objects.filter(visibility='public').order_by('-created_at')
+    return render(request, 'explore_all_ideas_individual.html', {'ideas': ideas})
+
+def idea_detail_individual(request, idea_id):
+    idea = get_object_or_404(Idea, id=idea_id)
+    context = {
+        'idea': idea,
+        'user_reaction': idea.get_like_status(request.user) if request.user.is_authenticated else None
+    }
+    return render(request, 'idea_detail_individual.html', context)
+
+def myjobs_individual(request):
+    job_applications = JobApplication.objects.filter(user=request.user)
+    
+    # Pass the job applications to the template
+    return render(request, 'myjobs_individual.html', {'job_applications': job_applications})
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def delete_idea(request, idea_id):
+    if request.method == 'DELETE':
+        try:
+            idea = Idea.objects.get(id=idea_id, email=request.user.email)
+            idea.delete()
+            return JsonResponse({'success': True})
+        except Idea.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Idea not found or unauthorized'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
