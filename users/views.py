@@ -1107,7 +1107,53 @@ def delete_opportunity(request, pk):
     return redirect('core') 
 
 
-@login_required
+from django.shortcuts import render
+from .models import IndividualProfile
+
+from django.shortcuts import render
+from .models import IndividualProfile
+
 def resume_database(request):
-    profiles = IndividualProfile.objects.exclude(resume="")  # Filter profiles with a resume uploaded
-    return render(request, 'resume_database.html', {'profiles': profiles})
+    filters = {
+        'location': request.GET.get('location', ''),
+        'role': request.GET.get('role', ''),
+        'qualification': request.GET.get('qualification', ''),
+        'experience': request.GET.get('experience', ''),
+        'key_skills': request.GET.get('key_skills', ''),
+        'min_salary': request.GET.get('min_salary', ''),
+        'max_salary': request.GET.get('max_salary', ''),
+        'work_type': request.GET.get('work_type', ''),
+        'availability_status': request.GET.get('availability_status', ''),
+    }
+
+    profiles = IndividualProfile.objects.all()
+
+    # Apply filters if provided
+    if filters['location']:
+        profiles = profiles.filter(location__icontains=filters['location'])
+    
+    if filters['role']:
+        profiles = profiles.filter(desired_role__icontains=filters['role'])  # Changed 'role' to 'desired_role'
+    
+    if filters['qualification']:
+        profiles = profiles.filter(qualification__icontains=filters['qualification'])
+    
+    if filters['experience']:
+        profiles = profiles.filter(current_duration__gte=filters['experience'])  # Assuming experience is stored in 'current_duration'
+    
+    if filters['key_skills']:  # Changed from 'skills' to 'key_skills'
+        profiles = profiles.filter(key_skills__icontains=filters['key_skills'])  # Changed 'skills' to 'key_skills'
+    
+    if filters['min_salary']:
+        profiles = profiles.filter(salary_expected__gte=filters['min_salary'])
+    
+    if filters['max_salary']:
+        profiles = profiles.filter(salary_expected__lte=filters['max_salary'])
+    
+    if filters['work_type']:
+        profiles = profiles.filter(work_type=filters['work_type'])
+    
+    if filters['availability_status']:
+        profiles = profiles.filter(availability_status=filters['availability_status'])
+
+    return render(request, 'resume_database.html', {'profiles': profiles, 'filters': filters})

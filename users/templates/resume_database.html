@@ -64,11 +64,103 @@
         .actions .download-btn {
             background-color: #28a745;
         }
+
+        .filter-form {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .filter-form form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-form label {
+            font-weight: bold;
+        }
+
+        .filter-form input,
+        .filter-form select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-form button {
+            background-color: #0073e6;
+            color: white;
+            padding: 7px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-form button:hover {
+            background-color: #005bb5;
+        }
+
+        .filter-form a {
+            text-decoration: none;
+            color: #0073e6;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Resume Database</h1>
+        <button onclick="toggleFilters()">Toggle Filters</button>
+        <div id="filter-section" style="display: none;">
+            <div class="filter-form">
+                <form method="get" action="">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" name="location" value="{{ filters.location|default:'' }}" placeholder="Enter location">
+                    
+                    <label for="role">Role:</label>
+                    <input type="text" id="role" name="role" value="{{ filters.role|default:'' }}" placeholder="Enter desired role">
+                    
+                    <label for="qualification">Qualification:</label>
+                    <input type="text" id="qualification" name="qualification" value="{{ filters.qualification|default:'' }}" placeholder="Enter qualification">
+                    
+                    <label for="experience">Min Experience (Years):</label>
+                    <input type="number" id="experience" name="experience" value="{{ filters.experience|default:'' }}" placeholder="e.g., 3">
+                    
+                    <label for="key_skills">Skills:</label>
+                    <input type="text" id="key_skills" name="key_skills" value="{{ filters.key_skills|default:'' }}" placeholder="e.g., Python, Django">
+                    
+                    <label for="min_salary">Min Salary:</label>
+                    <input type="number" id="min_salary" name="min_salary" value="{{ filters.min_salary|default:'' }}" placeholder="e.g., 50000">
+
+                    <label for="max_salary">Max Salary:</label>
+                    <input type="number" id="max_salary" name="max_salary" value="{{ filters.max_salary|default:'' }}" placeholder="e.g., 100000">
+                    
+                    <label for="work_type">Work Type:</label>
+                    <select id="work_type" name="work_type">
+                        <option value="">Select Work Type</option>
+                        <option value="remote" {% if filters.work_type == "remote" %}selected{% endif %}>Remote</option>
+                        <option value="onsite" {% if filters.work_type == "onsite" %}selected{% endif %}>Onsite</option>
+                        <option value="hybrid" {% if filters.work_type == "hybrid" %}selected{% endif %}>Hybrid</option>
+                    </select>
+
+                    <label for="availability_status">Availability:</label>
+                    <select id="availability_status" name="availability_status">
+                        <option value="">Select Availability</option>
+                        <option value="immediate" {% if filters.availability_status == "immediate" %}selected{% endif %}>Immediately Available</option>
+                        <option value="notice" {% if filters.availability_status == "notice" %}selected{% endif %}>Notice Period</option>
+                    </select>
+
+                    <button type="submit">Filter</button>
+                    <a href="{% url 'resume_database' %}">Clear Filters</a>
+                </form>
+            </div>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -103,5 +195,12 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        function toggleFilters() {
+            const section = document.getElementById('filter-section');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>
