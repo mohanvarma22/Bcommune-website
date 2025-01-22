@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #1a2734;
+            color: white;
+        }
+        form {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            color: black;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], textarea, select {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        textarea {
+            resize: vertical;
+        }
+
+        .checkbox-container {
+            display: flex; /* Use flexbox for better control over layout */
+            align-items: center; /* Vertically center the elements */
+        }
+
+        .checkbox-container input {
+            margin-right: 10px;
+        }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Style for the extra fields like location, salary, and mission */
+        .conditional-field {
+            display: none;
+        }
+        .messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.message.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.message.error {
+    background-color: #dc3545;
+    color: white;
+}
+
+    </style>
+</head>
+<body>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+<form action="#" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post Opportunity</button>
+</form>
+
+<script>
+    // Toggle compensation-related input fields based on selected compensation model
+    function toggleCompensationFields() {
+        var compensationType = document.getElementById("compensation").value;
+
+        // Hide all fields initially
+        document.getElementById("equity-percentage-field").style.display = "none";
+        document.getElementById("other-compensation-field").style.display = "none";
+        document.getElementById("salary-range").style.display = "none";
+
+        // Show the appropriate field based on the selected compensation model
+        if (compensationType === "Equity-Based") {
+            document.getElementById("equity-percentage-field").style.display = "block";
+        } else if (compensationType === "Other") {
+            document.getElementById("other-compensation-field").style.display = "block";
+        } else if (compensationType === "Paid Opportunity") {
+            document.getElementById("salary-range").style.display = "block";
+        }
+    }
+    // Toggle location field visibility based on location preference
+function toggleLocationField() {
+    var locationType = document.getElementById("location").value;
+    var locationField = document.getElementById("location-field");
+
+    // Show or hide location field based on selected location preference
+    if (locationType === "In-Person" || locationType === "Hybrid") {
+        locationField.style.display = "block";
+    } else {
+        locationField.style.display = "none";
+    }
+}
+
+</script>
+
+</body>
+</html>

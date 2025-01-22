@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication,LikeDislike
-from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm
+from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm,OpportunityForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -1036,3 +1036,34 @@ def dislike_idea(request, idea_id):
     obj.save()
     
     return JsonResponse({'likes': idea.likes,'dislikes': idea.dislikes,'message': 'Dislike toggled successfully!'}, status=200)
+from .models import CoreOpportunity
+
+def core_view(request):
+    individual_opportunities = CoreOpportunity.objects.filter(user=request.user).exclude(user__isnull=True)
+    other_opportunities = CoreOpportunity.objects.exclude(user=request.user).exclude(user__isnull=True)
+
+    context = {
+        'individual_opportunities': individual_opportunities,
+        'other_opportunities': other_opportunities,
+    }
+
+    return render(request, 'core.html', context)
+
+# This is the view for the form submission page
+
+def core_form_view(request):
+    if request.method == 'POST':
+        form = OpportunityForm(request.POST)
+        if form.is_valid():
+            # Assign the current user to the `user` field before saving
+            opportunity = form.save(commit=False)
+            opportunity.user = request.user
+            opportunity.save()
+            messages.success(request, "Your opportunity has been posted successfully!")
+            return redirect('core')
+        else:
+            messages.error(request, "There was an error in your submission. Please correct the highlighted fields.")
+    else:
+        form = OpportunityForm()
+
+    return render(request, 'coreform.html', {'form': form})

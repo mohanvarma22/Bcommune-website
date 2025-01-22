@@ -6,6 +6,98 @@
     <title>Edit Freelance Project</title>
 </head>
 <body>
+
+    <style>
+/* Form Styling */
+#editFreelanceForm {
+    margin: 20px auto;
+    width: 90%;
+    color: #1a2734;
+}
+
+/* Form Header */
+#editFreelanceForm h1 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #1a2734;
+    font-weight: bold;
+}
+
+/* Form Group */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #1a2734;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="file"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #4CAF50;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Submit Button */
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background-color: #1a2734;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #4CAF50;
+    transform: scale(1.02);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #editFreelanceForm {
+        padding: 15px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    button[type="submit"] {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+}
+    </style>
     {% include 'header2.html' %}
     <div class="main-container">
         {% include 'sidebarcompany.html' %}

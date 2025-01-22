@@ -170,7 +170,7 @@ class BidForm(forms.ModelForm):
             'client_testimonials': forms.Textarea(attrs={'rows': 3}),
         }
 
-        
+
 class FreelanceProjectForm(forms.ModelForm):
     class Meta:
         model = FreelanceProject
@@ -222,3 +222,15 @@ class JobApplicationForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = ['phone_number', 'email','degree', 'percentage', 'work_experience', 'resume', 'skills']
+
+
+from .models import CoreOpportunity
+
+class OpportunityForm(forms.ModelForm):
+    class Meta:
+        model = CoreOpportunity
+        fields = ['opportunity_title', 'role_details', 'responsibilities', 'key_objectives', 
+                  'expertise', 'benefits', 'opportunity_type', 'industry', 'description', 
+                  'stage', 'company_mission', 'requirements', 'compensation', 
+                  'equity_percentage', 'other_compensation', 'salary', 'experience', 
+                  'location', 'location_details', 'commitment', 'future_plans', 'terms', 'nda']

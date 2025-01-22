@@ -1,26 +1,31 @@
-/* General Styles */
-* {
+/* General Reset */
+body, html {
     margin: 0;
     padding: 0;
+    font-family: 'Arial', sans-serif;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
 }
 
 body {
-    background-color: #f9fafb;
+    background-color: #f8f9fa;
     color: #333;
-    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Navbar */
+/* Navbar/Header */
+header {
+    background-color: #004c99;
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 .navbar {
-    background-color: #1a2734;
-    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .navbar .logo img {
@@ -28,9 +33,9 @@ body {
 }
 
 .navbar nav a {
-    color: #fff;
+    color: white;
     text-decoration: none;
-    margin-left: 20px;
+    margin: 0 10px;
     font-size: 16px;
 }
 
@@ -43,196 +48,123 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: flex-start;
-    gap: 50px;
-    padding: 40px 20px;
+    align-items: center;
+    margin: 20px auto;
+    width: 90%;
     max-width: 1200px;
-    margin: 0 auto;
+    flex-grow: 1;
+}
+
+.right-column {
+    flex: 1;
+    text-align: center;
+    margin: 20px;
+    padding: 20px;
+}
+
+.right-column h1 {
+    font-size: 24px;
+    color: #004c99;
+    margin-bottom: 20px;
+}
+
+.right-column .learn-btn {
+    background-color: #004c99;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.right-column .learn-btn:hover {
+    background-color: #003366;
 }
 
 /* Login Box */
 .login-box {
-    background-color: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    flex: 1;
     max-width: 400px;
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px;
 }
 
 .login-box h3 {
-    text-align: center;
+    font-size: 22px;
+    color: #004c99;
     margin-bottom: 20px;
-    font-size: 20px;
-    color: #007bff;
+    text-align: center;
 }
 
 .login-box label {
     display: block;
-    margin: 10px 0 5px;
     font-size: 14px;
-    color: #555;
+    margin-bottom: 5px;
+    color: #333;
 }
 
-.login-box input {
+.login-box input[type="email"],
+.login-box input[type="password"] {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
     margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     font-size: 14px;
-}
-
-.login-box .forgot {
-    font-size: 13px;
-    color: #007bff;
-    text-decoration: none;
-    text-align: right;
-    display: block;
-    margin-bottom: 20px;
 }
 
 .login-box button {
-    background-color: #007bff;
+    width: 100%;
+    background-color: #004c99;
     color: white;
-    padding: 12px;
     border: none;
     border-radius: 5px;
-    width: 100%;
+    padding: 10px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
 .login-box button:hover {
-    background-color: #0056b3;
+    background-color: #003366;
 }
 
-.social-login {
-    text-align: center;
-    margin-top: 10px;
-}
-
-.social-login span {
+.login-box p {
     font-size: 14px;
-    color: #777;
-    margin-bottom: 10px;
-    display: block;
-}
-
-.social-icons img {
-    width: 40px;
-    margin: 5px 10px;
-    cursor: pointer;
-}
-
-.signup {
     text-align: center;
-    font-size: 14px;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-.signup a {
-    color: #007bff;
+.login-box p a {
+    color: #004c99;
     text-decoration: none;
-    font-weight: 600;
 }
 
-.signup a:hover {
+.login-box p a:hover {
     text-decoration: underline;
-}
-
-/* Right Column */
-.right-column {
-    text-align: center;
-    flex: 1 1 300px;
-    padding: 20px;
-    max-width: 400px;
-}
-
-.right-column h1 {
-    font-size: 22px;
-    color: #333;
-    margin-bottom: 20px;
-    font-family: 'Cambria', serif;
-}
-
-.learn-btn {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.learn-btn:hover {
-    background-color: #0056b3;
 }
 
 /* Footer */
 footer {
-    background-color: #1a2734;
-    color: #fff;
+    background-color: #004c99;
+    color: white;
     text-align: center;
-    padding: 15px;
-    font-size: 14px;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-
-footer p {
-    margin: 0;
+    padding: 10px 0;
+    margin-top: auto;
 }
 
 footer a {
-    color: #007bff;
+    color: white;
     text-decoration: none;
     margin: 0 10px;
+    font-size: 14px;
 }
 
 footer a:hover {
     text-decoration: underline;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .login-box {
-        max-width: 100%;
-    }
-
-    .right-column {
-        max-width: 100%;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .navbar .logo img {
-        height: 40px;
-    }
-
-    .container {
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .right-column h1 {
-        font-size: 18px;
-    }
-
-    .learn-btn {
-        font-size: 14px;
-        padding: 10px;
-    }
 }

@@ -65,6 +65,8 @@ urlpatterns = [
      path('saved-applications/', views.saved_applications, name='saved_applications'),
      path('update-category/<int:saved_id>/', views.update_category, name='update_category'),
      path('like/<int:idea_id>/', views.like_idea, name='like_idea'),
+     path('core/', views.core_view, name='core'),  # Core page with the button
+     path('coreform/', views.core_form_view, name='coreform'),
      path('dislike/<int:idea_id>/', views.dislike_idea, name='dislike_idea'),
 ]
 

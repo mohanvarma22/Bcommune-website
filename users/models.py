@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.conf import settings 
 from django.contrib.auth import get_user_model
 from pydantic import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class CustomUser(AbstractUser):
     USER_TYPE_CHOICES = (
@@ -486,3 +487,49 @@ class LikeDislike(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+
+from django.db import models
+
+class CoreOpportunity(models.Model):
+    OPPORTUNITY_TYPES = [
+        ('Co-Founder Role', 'Co-Founder Role'),
+        ('Advisor', 'Advisor'),
+        ('Investor Partnership', 'Investor Partnership'),
+        ('Team Member', 'Team Member'),
+        ('Other', 'Other'),
+    ]
+    
+    COMPENSATION_TYPES = [
+        ('Equity-Based', 'Equity-Based'),
+        ('Paid Opportunity', 'Paid Opportunity'),
+        ('Other', 'Other'),
+    ]
+
+    opportunity_title = models.CharField(max_length=200)
+    role_details = models.TextField()
+    responsibilities = models.TextField()
+    key_objectives = models.TextField()
+    expertise = models.CharField(max_length=200)
+    benefits = models.TextField()
+    opportunity_type = models.CharField(max_length=50, choices=OPPORTUNITY_TYPES)
+    industry = models.CharField(max_length=100)
+    description = models.TextField()
+    stage = models.CharField(max_length=50)
+    company_mission = models.TextField()
+    requirements = models.CharField(max_length=200)
+    compensation = models.CharField(max_length=50, choices=COMPENSATION_TYPES)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,null=True, blank=True)
+    # Fields that can be nullable or conditional
+    equity_percentage = models.FloatField(null=True, blank=True)  # Only for 'Equity-Based' compensation
+    other_compensation = models.CharField(max_length=200, null=True, blank=True)  # Only for 'Other' compensation
+    salary = models.CharField(max_length=100, null=True, blank=True)  # Only for 'Paid Opportunity'
+    experience = models.CharField(max_length=100, null=True, blank=True)
+    location = models.CharField(max_length=50, null=True, blank=True)  # Nullable so that it doesn't break existing rows
+    location_details = models.CharField(max_length=200, null=True, blank=True)  # Nullable for location-specific details
+    commitment = models.CharField(max_length=50)
+    future_plans = models.TextField()
+    terms = models.BooleanField(default=False)
+    nda = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.opportunity_title
