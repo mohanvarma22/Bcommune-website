@@ -195,21 +195,58 @@ class IndividualProfile(models.Model):
         return f"{self.user.username}'s Profile"
     
 class Bid(models.Model):
+    # Existing core fields
     project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='bids')
-    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, 
-                              limit_choices_to={'user_type': 'company'})  # Only companies can bid
-    amount = models.DecimalField(max_digits=15, decimal_places=2)
-    proposal = models.TextField()
-    estimated_timeline = models.IntegerField(help_text="Estimated days to complete")
+    bidder = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                              limit_choices_to={'user_type': 'company'})
+    amount = models.DecimalField(max_digits=15, decimal_places=2, verbose_name="Proposed Price")
+    
+    # Make new required fields nullable with blank=True for forms
+    payment_terms = models.TextField(verbose_name="Payment Terms", null=True, blank=True)
+    estimated_timeline = models.IntegerField(
+        help_text="Estimated days to complete",
+        null=True,
+        blank=True
+    )
+    preferred_start_date = models.DateField(null=True, blank=True)
+    project_approach = models.TextField(verbose_name="Project Approach", null=True, blank=True)
+    team_resources = models.TextField(verbose_name="Team/Resources Description", null=True, blank=True)
+    company_profile = models.TextField(verbose_name="Company Profile", null=True, blank=True)
+    
+    # Optional fields
+    portfolio_links = models.TextField(verbose_name="Portfolio/Previous Work Links", blank=True, null=True)
+    client_testimonials = models.TextField(verbose_name="Client Testimonials/References", blank=True, null=True)
+    minimum_budget_expectation = models.DecimalField(
+        max_digits=15, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Minimum Budget Expectation"
+    )
     additional_details = models.TextField(blank=True, null=True)
+    
+    # File fields
+    proposal_document = models.FileField(
+        upload_to='bid_proposals/',
+        null=True,
+        blank=True,
+        verbose_name="Proposal Document"
+    )
+    
+    
+    # Custom fields
+    custom_fields = models.JSONField(default=dict, blank=True)
+    
+    # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         unique_together = ['project', 'bidder']
         
     def __str__(self):
         return f"Bid by {self.bidder.company_name} on {self.project}"
-    
+
 
 class FreelanceProject(models.Model):
     CATEGORY_CHOICES = [

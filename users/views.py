@@ -465,37 +465,57 @@ def faq(request):
 
 @login_required
 def place_project_bid(request, project_id):
+    # Get the project or return 404
+    project = get_object_or_404(Project, id=project_id)
+    
     # Check if user is a company
     if request.user.user_type != 'company':
         messages.error(request, "Only companies can place bids!")
-        return redirect('explore_projects')  # Redirect to explore_projects
-    
-    project = get_object_or_404(Project, id=project_id)
+        return redirect('explore_projects')
     
     # Prevent project owner from bidding on their own project
     if project.company == request.user:
         messages.error(request, "You cannot bid on your own project!")
-        return redirect('explore_projects')  # Redirect to explore_projects
+        return redirect('explore_projects')
     
-    # Check if user already has a bid
-    existing_bid = Bid.objects.filter(project=project, bidder=request.user).first()
+    # Check if the bidder has already placed a bid
+    if Bid.objects.filter(project=project, bidder=request.user).exists():
+        messages.error(request, "You have already placed a bid on this project.")
+        return redirect('explore_projects')
     
     if request.method == 'POST':
-        form = BidForm(request.POST, instance=existing_bid)
+        form = BidForm(request.POST, request.FILES)
         if form.is_valid():
             bid = form.save(commit=False)
             bid.project = project
             bid.bidder = request.user
-            bid.save()
-            messages.success(request, 'Your bid has been placed successfully!')
-            return redirect('explore_projects')  # Redirect to explore_projects
+            
+            # Handle custom fields
+            custom_fields = {}
+            for key, value in request.POST.items():
+                if key.startswith('custom_field_name_'):
+                    field_num = key.split('_')[-1]
+                    field_name = value
+                    field_value = request.POST.get(f'custom_field_value_{field_num}')
+                    if field_name and field_value:
+                        custom_fields[field_name] = field_value
+            
+            bid.custom_fields = custom_fields
+            
+            try:
+                bid.save()
+                messages.success(request, 'Your bid has been submitted successfully!')
+                return redirect('explore_projects')
+            except IntegrityError:
+                messages.error(request, "An error occurred while saving your bid. Please try again.")
+        else:
+            messages.error(request, "There was an error in your bid form. Please correct it and try again.")
     else:
-        form = BidForm(instance=existing_bid)
+        form = BidForm()
     
     context = {
         'form': form,
         'project': project,
-        'existing_bid': existing_bid
     }
     return render(request, 'bidform.html', context)
 
@@ -717,11 +737,19 @@ def edit_freelance(request, project_id):
     form = FreelanceProjectForm(instance=project)
     return render(request, 'edit_freelance.html', {'form': form, 'project': project})
 
+@login_required
 def view_bids(request, project_id):
     # Fetch the project and its associated bids
     project = get_object_or_404(Project, id=project_id)
-    bids = project.bids.select_related('bidder').order_by('-created_at')  # Assuming related_name is `bids` in the ForeignKey
-
+    
+    # Ensure user has permission to view bids (project owner or admin)
+    if project.company != request.user and not request.user.is_staff:
+        messages.error(request, "You don't have permission to view these bids.")
+        return redirect('explore_projects')
+    
+    # Get bids with related bidder information
+    bids = project.bids.select_related('bidder').order_by('-created_at')
+    
     context = {
         "project": project,
         "bids": bids,

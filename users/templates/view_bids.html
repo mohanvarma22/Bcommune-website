@@ -4,41 +4,355 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bids for {{ project.title }}</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .project-header {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .project-header h1 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .bid-item {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .bid-summary {
+            padding: 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bid-summary:hover {
+            background: #e9ecef;
+        }
+
+        .bid-preview {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .bid-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .bid-meta-item {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .expand-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .expand-btn:hover {
+            background: #0056b3;
+        }
+
+        .bid-details {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .bid-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .bid-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .bid-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .files-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .file-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: #e9ecef;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-link:hover {
+            background: #dee2e6;
+        }
+
+        .custom-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .no-bids {
+            text-align: center;
+            padding: 40px;
+            background: #fff;
+            border-radius: 8px;
+            color: #6c757d;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-back:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .bid-preview {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .bid-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .custom-fields {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bids for {{ project.title }}</h1>
-        <p><strong>Project Type:</strong> {{ project.project_type }}</p>
-        <p><strong>Industry:</strong> {{ project.industry }}</p>
+        <div class="project-header">
+            <h1>Bids for {{ project.title }}</h1>
+            <div class="bid-meta">
+                <span class="bid-meta-item">📁 <strong>Project Type:</strong> {{ project.project_type }}</span>
+                <span class="bid-meta-item">🏢 <strong>Industry:</strong> {{ project.industry }}</span>
+                <span class="bid-meta-item">📊 <strong>Total Bids:</strong> {{ bids|length }}</span>
+            </div>
+        </div>
 
         <div class="bids-section">
             {% if bids %}
-                <h2>Bids Received</h2>
                 {% for bid in bids %}
                     <div class="bid-item">
-                        <p><strong>Bidder:</strong> {{ bid.bidder.company_name }}</p>
-                        <p><strong>Industry:</strong> {{ bid.bidder.industry }}</p>
-                        <p><strong>Core Services:</strong> {{ bid.bidder.core_services|linebreaks }}</p>
-                        <p><strong>Amount:</strong> ${{ bid.amount }}</p>
-                        <p><strong>Timeline:</strong> {{ bid.estimated_timeline }} days</p>
-                        <p><strong>Proposal:</strong> {{ bid.proposal|linebreaks }}</p>
-                        {% if bid.additional_details %}
-                            <p><strong>Additional Details:</strong> {{ bid.additional_details }}</p>
-                        {% endif %}
-                        <p><strong>Company Website:</strong> <a href="{{ bid.bidder.company_website }}" target="_blank">
-                            {{ bid.bidder.company_website }}</a>
-                        </p>
-                        <p><strong>Submitted:</strong> {{ bid.created_at|timesince }} ago</p>
+                        <div class="bid-summary" onclick="toggleBid(this)">
+                            <div class="bid-preview">
+                                <span class="bid-meta-item">🏢 <strong>Company:</strong> {{ bid.bidder.company_name }}</span>
+                                <span class="bid-meta-item">💰 <strong>Amount:</strong> ${{ bid.amount|floatformat:2 }}</span>
+                                <span class="bid-meta-item">⏱️ <strong>Timeline:</strong> {{ bid.estimated_timeline }} days</span>
+                            </div>
+                            <button class="expand-btn">View Details</button>
+                        </div>
+                        
+                        <div class="bid-details">
+                            <div class="bid-section">
+                                <h3 class="section-title">Company Information</h3>
+                                <div class="bid-meta">
+                                    <span class="bid-meta-item">🏭 <strong>Industry:</strong> {{ bid.bidder.industry }}</span>
+                                    <span class="bid-meta-item">📅 <strong>Submitted:</strong> {{ bid.created_at|timesince }} ago</span>
+                                </div>
+                                {% if bid.company_profile %}
+                                    <p><strong>Company Profile:</strong></p>
+                                    <p>{{ bid.company_profile|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="bid-section">
+                                <h3 class="section-title">Bid Details</h3>
+                                <div class="bid-meta">
+                                    {% if bid.preferred_start_date %}
+                                        <span class="bid-meta-item">📆 <strong>Preferred Start:</strong> {{ bid.preferred_start_date }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if bid.payment_terms %}
+                                    <p><strong>Payment Terms:</strong></p>
+                                    <p>{{ bid.payment_terms|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="bid-section">
+                                <h3 class="section-title">Project Approach</h3>
+                                {% if bid.project_approach %}
+                                    <p>{{ bid.project_approach|linebreaks }}</p>
+                                {% endif %}
+                                {% if bid.team_resources %}
+                                    <p><strong>Team & Resources:</strong></p>
+                                    <p>{{ bid.team_resources|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+
+                            {% if bid.portfolio_links or bid.client_testimonials %}
+                                <div class="bid-section">
+                                    <h3 class="section-title">Portfolio & References</h3>
+                                    {% if bid.portfolio_links %}
+                                        <p><strong>Portfolio:</strong></p>
+                                        <p>{{ bid.portfolio_links|urlize|linebreaks }}</p>
+                                    {% endif %}
+                                    {% if bid.client_testimonials %}
+                                        <p><strong>Client Testimonials:</strong></p>
+                                        <p>{{ bid.client_testimonials|linebreaks }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if bid.proposal_document or bid.certifications %}
+                                <div class="bid-section">
+                                    <h3 class="section-title">Documents</h3>
+                                    <div class="files-section">
+                                        {% if bid.proposal_document %}
+                                            <a href="{{ bid.proposal_document.url }}" class="file-link" target="_blank">
+                                                📄 View Proposal
+                                            </a>
+                                        {% endif %}
+                                        {% if bid.certifications %}
+                                            <a href="{{ bid.certifications.url }}" class="file-link" target="_blank">
+                                                📋 View Certifications
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if bid.custom_fields %}
+                                <div class="bid-section">
+                                    <h3 class="section-title">Additional Information</h3>
+                                    <div class="custom-fields">
+                                        {% for field_name, field_value in bid.custom_fields.items %}
+                                            <div>
+                                                <strong>{{ field_name }}:</strong> {{ field_value }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
-                <p>No bids have been received for this project yet.</p>
+                <div class="no-bids">
+                    <h2>No Bids Yet</h2>
+                    <p>This project hasn't received any bids yet.</p>
+                </div>
             {% endif %}
         </div>
-        
 
-        <a href="{% url 'all_projects' %}" class="btn-back">Back to Projects</a>
+        <a href="{% url 'explore_projects' %}" class="btn-back">← Back to Projects</a>
     </div>
+
+    <script>
+        function toggleBid(element) {
+            const details = element.nextElementSibling;
+            const button = element.querySelector('.expand-btn');
+            const allDetails = document.querySelectorAll('.bid-details');
+            const allButtons = document.querySelectorAll('.expand-btn');
+            
+            // Close all other open bids
+            allDetails.forEach(detail => {
+                if (detail !== details && detail.classList.contains('active')) {
+                    detail.classList.remove('active');
+                }
+            });
+            
+            allButtons.forEach(btn => {
+                if (btn !== button) {
+                    btn.textContent = 'View Details';
+                }
+            });
+            
+            // Toggle current bid
+            if (details.classList.contains('active')) {
+                details.classList.remove('active');
+                button.textContent = 'View Details';
+            } else {
+                details.classList.add('active');
+                button.textContent = 'Hide Details';
+            }
+        }
+    </script>
 </body>
 </html>

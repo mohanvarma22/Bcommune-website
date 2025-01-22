@@ -159,15 +159,18 @@ class CompanyProfileForm(forms.ModelForm):
 class BidForm(forms.ModelForm):
     class Meta:
         model = Bid
-        fields = ['amount', 'proposal', 'estimated_timeline', 'additional_details']
+        exclude = ['project', 'bidder', 'created_at', 'updated_at']
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control'}),
-            'proposal': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
-            'estimated_timeline': forms.NumberInput(attrs={'class': 'form-control'}),
-            'additional_details': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'preferred_start_date': forms.DateInput(attrs={'type': 'date'}),
+            'project_approach': forms.Textarea(attrs={'rows': 4}),
+            'payment_terms': forms.Textarea(attrs={'rows': 3}),
+            'team_resources': forms.Textarea(attrs={'rows': 4}),
+            'company_profile': forms.Textarea(attrs={'rows': 4}),
+            'portfolio_links': forms.Textarea(attrs={'rows': 2}),
+            'client_testimonials': forms.Textarea(attrs={'rows': 3}),
         }
 
-
+        
 class FreelanceProjectForm(forms.ModelForm):
     class Meta:
         model = FreelanceProject
