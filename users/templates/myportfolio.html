@@ -186,35 +186,37 @@
         <!-- Main Content -->
         <div class="content">
             <section class="portfolio-jobs">
-                <a href="{% url 'all_jobs' %}?job_id={{ job.id }}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"> Jobs Posted</h2></a>
+                <a href="{% url 'all_jobs' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"> Jobs Posted </h2></a>
                 <div class="job-cards-container">
                     {% if jobs %}
                         {% for job in jobs %}
-                        <a href="{% url 'all_jobs' %}?job_id={{ job.id }}" style="text-decoration: none; color: inherit;">
-                            <div class="job-card">
-                                <div class="card-header">
-                                    <div class="header-content">
-                                        <h3>{{ job.title }}</h3>
-                                        <p class="company">{{ job.company }}</p>
+                            <a href="{% url 'all_jobs' %}?job_id={{ job.id }}" style="text-decoration: none; color: inherit;">
+                                <div class="job-card" onclick="selectJobCard({{ job.id }})">
+                                    <div class="card-header">
+                                        <div class="header-content">
+                                            <h3>{{ job.title }}</h3>
+                                            <p class="company">{{ job.company }}</p>
+                                        </div>
+                                        <img src="{% static 'images/B.png' %}" alt="{{ job.company }} Logo" class="header-image" style="border-radius: 50%;">
                                     </div>
-                                    <img src="{% static 'images/B.png' %}" alt="{{ job.company }} Logo" class="header-image" style="border-radius: 50%;">
-                                </div>
-                                <div class="card-body">
-                                    <p class="location">📍 {{ job.location }}</p>
-                                    <p class="salary">💰 {{ job.salary }}</p>
-                                    <div class="requirements">
-                                        <h4>Requirements:</h4>
-                                        <p>{{ job.requirements }}</p>
+                                    <div class="card-body">
+                                        <p class="location">📍 {{ job.location }}</p>
+                                        <p class="salary">💰 {{ job.salary }}</p>
+                                        <div class="requirements">
+                                            <h4>Requirements:</h4>
+                                            <p>{{ job.requirements }}</p>
+                                        </div>
                                     </div>
+                                    <p class="posted-date">Posted: {{ job.posted_date|date:"M d, Y" }}</p>
                                 </div>
-                                <p class="posted-date">Posted: {{ job.posted_date|date:"M d, Y" }}</p>
-                            </div>
+                            </a>
                         {% endfor %}
                     {% else %}
                         <p class="no-jobs">No jobs available in the portfolio.</p>
                     {% endif %}
                 </div>
             </section>
+            
             <!-- Projects Section -->
 <section class="portfolio-projects">
     <a href="{% url 'all_projects' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Projects Posted </h2></a>

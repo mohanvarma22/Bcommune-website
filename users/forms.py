@@ -93,6 +93,11 @@ class IndividualSignupForm(forms.Form):
 
 
 class IndividualProfileForm(forms.ModelForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'readonly': 'readonly'})  # Make the email readonly
+    )
+
     class Meta:
         model = IndividualProfile
         fields = [
@@ -100,7 +105,8 @@ class IndividualProfileForm(forms.ModelForm):
             'key_skills', 'industries_of_interest', 'desired_role', 'desired_location',
             'work_type', 'salary_expected', 'current_position_title', 'current_company',
             'current_duration', 'key_responsibilities', 'qualification', 'institution',
-            'year_of_completion', 'certifications', 'projects', 'awards', 'publications', 'hobbies'
+            'year_of_completion', 'certifications', 'projects', 'awards', 'publications',
+            'hobbies', 'resume',
         ]
         widgets = {
             'about_me': forms.Textarea(attrs={'rows': 4}),
@@ -112,6 +118,12 @@ class IndividualProfileForm(forms.ModelForm):
             'publications': forms.Textarea(attrs={'rows': 2}),
             'hobbies': forms.TextInput(attrs={'placeholder': 'e.g., Reading, Traveling'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Get the user instance if passed
+        super(IndividualProfileForm, self).__init__(*args, **kwargs)
+        if user:  # Populate the email field with the user's email
+            self.fields['email'].initial = user.email
 
 class CompanyProfileForm(forms.ModelForm):
     class Meta:
@@ -153,8 +165,6 @@ class CompanyProfileForm(forms.ModelForm):
             'social_media_links': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'portfolio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
-
-
 
 class BidForm(forms.ModelForm):
     class Meta:

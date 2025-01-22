@@ -191,9 +191,17 @@ class IndividualProfile(models.Model):
 
     # Interests Section
     hobbies = models.JSONField(blank=True, null=True)  # Store as a list
-
+    resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     def __str__(self):
         return f"{self.user.username}'s Profile"
+    
+class IndividualProfileUpdate(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"Profile Update for {self.name}"
     
 class Bid(models.Model):
     # Existing core fields

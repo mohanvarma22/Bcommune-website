@@ -5,83 +5,180 @@
 <head>
     <title>{{ profile.user.username }}'s Profile</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #0073e6;
+            margin-bottom: 20px;
+        }
+
         .profile-img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
             object-fit: cover;
+            border: 3px solid #0073e6;
+        }
+
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header a {
+            text-decoration: none;
+            color: #0073e6;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        .profile-header a:hover {
+            text-decoration: underline;
         }
 
         .section-title {
             margin-top: 30px;
             font-size: 1.5em;
             font-weight: bold;
+            color: #0073e6;
+            border-bottom: 2px solid #0073e6;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .section-content {
             margin-bottom: 20px;
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
         }
 
         .section-content p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .section-content p strong {
+            color: #555;
+        }
+
+        .section-content ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        .section-content ul li {
             margin: 5px 0;
         }
+
     </style>
 </head>
 <body>
-    <a href="{% url 'edit_individual_profile' %}">Edit Profile</a>
-    <h1>{{ profile.user.first_name }}'s Profile</h1>
+    <div class="container">
+        <div class="profile-header">
+            <h1>{{ profile.user.first_name }}'s Profile</h1>
+            <div>
+                <a href="{% url 'edit_individual_profile' %}">Edit Profile</a>
+                <a href="{% url 'individual_dashboard' %}">Back to Home Page</a>
+            </div>
+        </div>
 
-    <!-- Check if profile picture exists -->
-    {% if profile.profile_picture %}
-        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
-    {% else %}
-        <img src="{% static 'images/default_profile_picture.png' %}" alt="Default Profile Picture" class="profile-img">
+        <!-- Check if profile picture exists -->
+        <div class="text-center">
+            {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="profile-img">
+            {% else %}
+                <img src="{% static 'images/default_profile_picture.png' %}" alt="Default Profile Picture" class="profile-img">
+            {% endif %}
+        </div>
+        {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
     {% endif %}
 
-    <div class="section-title">General Information</div>
-    <div class="section-content">
-        <p><strong>Location:</strong> {{ profile.location }}</p>
-        <p><strong>Tagline:</strong> {{ profile.tagline }}</p>
-        <p><strong>Availability Status:</strong> {{ profile.get_availability_status_display }}</p>
-        <p><strong>About Me:</strong> {{ profile.about_me }}</p>
-        <p><strong>Desired Role:</strong> {{ profile.desired_role }}</p>
-        <p><strong>Desired Location:</strong> {{ profile.desired_location }}</p>
-        <p><strong>Work Type:</strong> {{ profile.get_work_type_display }}</p>
-        <p><strong>Expected Salary:</strong> {{ profile.salary_expected }}</p>
-    </div>
+    <div class="section-title">Resume</div>
+<div class="section-content">
+    {% if profile.resume %}
+        <p><strong>Resume:</strong></p>
+        <div>
+            <!-- Open button -->
+            <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-primary" style="text-decoration: none; color: white; background-color: #0073e6; padding: 10px 15px; border-radius: 5px; margin-right: 10px;">Open</a>
+            
+            <!-- Download button -->
+            <a href="{{ profile.resume.url }}" download="{{ profile.user.first_name }}_resume.pdf" class="btn btn-secondary" style="text-decoration: none; color: white; background-color: #28a745; padding: 10px 15px; border-radius: 5px;">Download</a>
+        </div>
+    {% else %}
+        <p>No resume uploaded yet.</p>
+    {% endif %}
+</div>
 
-    <div class="section-title">Work Experience</div>
-    <div class="section-content">
-        <p><strong>Current Position:</strong> {{ profile.current_position_title }}</p>
-        <p><strong>Current Company:</strong> {{ profile.current_company }}</p>
-        <p><strong>Duration:</strong> {{ profile.current_duration }}</p>
-        <p><strong>Key Responsibilities:</strong> {{ profile.key_responsibilities }}</p>
-    </div>
+        <div class="section-title">General Information</div>
+        <div class="section-content">
+            <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong>Location:</strong> {{ profile.location }}</p>
+            <p><strong>Tagline:</strong> {{ profile.tagline }}</p>
+            <p><strong>Availability Status:</strong> {{ profile.get_availability_status_display }}</p>
+            <p><strong>About Me:</strong> {{ profile.about_me }}</p>
+            <p><strong>Desired Role:</strong> {{ profile.desired_role }}</p>
+            <p><strong>Desired Location:</strong> {{ profile.desired_location }}</p>
+            <p><strong>Work Type:</strong> {{ profile.get_work_type_display }}</p>
+            <p><strong>Expected Salary:</strong> {{ profile.salary_expected }}</p>
+        </div>
 
-    <div class="section-title">Education</div>
-    <div class="section-content">
-        <p><strong>Qualification:</strong> {{ profile.qualification }}</p>
-        <p><strong>Institution:</strong> {{ profile.institution }}</p>
-        <p><strong>Year of Completion:</strong> {{ profile.year_of_completion }}</p>
-        <p><strong>Certifications:</strong> {{ profile.certifications|join:", " }}</p>
-    </div>
+        <div class="section-title">Work Experience</div>
+        <div class="section-content">
+            <p><strong>Current Position:</strong> {{ profile.current_position_title }}</p>
+            <p><strong>Current Company:</strong> {{ profile.current_company }}</p>
+            <p><strong>Duration:</strong> {{ profile.current_duration }}</p>
+            <p><strong>Key Responsibilities:</strong> {{ profile.key_responsibilities }}</p>
+        </div>
 
-    <div class="section-title">Portfolio/Projects</div>
-    <div class="section-content">
-        <p><strong>Projects:</strong> {{ profile.projects|join:", " }}</p>
-    </div>
+        <div class="section-title">Education</div>
+        <div class="section-content">
+            <p><strong>Qualification:</strong> {{ profile.qualification }}</p>
+            <p><strong>Institution:</strong> {{ profile.institution }}</p>
+            <p><strong>Year of Completion:</strong> {{ profile.year_of_completion }}</p>
+            <p><strong>Certifications:</strong> {{ profile.certifications|join:", " }}</p>
+        </div>
 
-    <div class="section-title">Achievements</div>
-    <div class="section-content">
-        <p><strong>Awards:</strong> {{ profile.awards|join:", " }}</p>
-        <p><strong>Publications:</strong> {{ profile.publications|join:", " }}</p>
-    </div>
+        <div class="section-title">Portfolio/Projects</div>
+        <div class="section-content">
+            <p><strong>Projects:</strong> {{ profile.projects|join:", " }}</p>
+        </div>
 
-    <div class="section-title">Interests</div>
-    <div class="section-content">
-        <p><strong>Hobbies:</strong> {{ profile.hobbies|join:", " }}</p>
-    </div>
+        <div class="section-title">Achievements</div>
+        <div class="section-content">
+            <p><strong>Awards:</strong> {{ profile.awards|join:", " }}</p>
+            <p><strong>Publications:</strong> {{ profile.publications|join:", " }}</p>
+        </div>
 
-   
+        <div class="section-title">Interests</div>
+        <div class="section-content">
+            <p><strong>Hobbies:</strong> {{ profile.hobbies|join:", " }}</p>
+        </div>
+    </div>
 </body>
 </html>

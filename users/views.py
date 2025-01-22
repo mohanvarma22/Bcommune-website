@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -80,14 +81,17 @@ def individual_dashboard(request):
     if request.user.user_type != 'individual':
         return redirect('individual_login')
 
-    # Fetch all ideas
-    ideas = Idea.objects.all()
-
+    # Fetch the most recent three ideas posted by different people (excluding the current user)
+    # ideas = Idea.objects.filter(email__ne=request.user.email).order_by('-created_at')[:3]
+    ideas = Idea.objects.exclude(email=request.user.email).order_by('-created_at')[:3]
+    other_opportunities = CoreOpportunity.objects.exclude(user=request.user).exclude(user__isnull=True)
     # Fetch jobs and order by the most recent
-    jobs = Job.objects.all().order_by('-posted_date')
+    jobs = Job.objects.all().order_by('-posted_date').order_by('posted_date')[:3]
 
     # Fetch top 3 most recent freelance projects
     freelance_projects = FreelanceProject.objects.all().order_by('-created_at')[:3]
+    recent_internships = Internship.objects.all().order_by('-posted_date')[:3]
+
 
     # Render the dashboard
     return render(
@@ -97,9 +101,10 @@ def individual_dashboard(request):
             'ideas': ideas,
             'jobs': jobs,
             'freelance_projects': freelance_projects,
+            'recent_internships':recent_internships,
+            'other_opportunities':other_opportunities,
         }
     )
-
 def company_signup(request):
     if request.method == 'POST':
         form = CompanySignupForm(request.POST)
@@ -428,12 +433,15 @@ def edit_individual_profile(request):
         profile = IndividualProfile(user=request.user)
 
     if request.method == 'POST':
-        form = IndividualProfileForm(request.POST, request.FILES, instance=profile)
+        form = IndividualProfileForm(request.POST, request.FILES, instance=profile, user=request.user)
         if form.is_valid():
             form.save()
-            return redirect('individual_profile')  # Replace with the desired redirect URL
+            messages.success(request, "Profile updated successfully!")
+            return redirect('individual_profile')  # Redirect to the profile page
+        else:
+            messages.error(request, "There was an error updating your profile. Please try again.")
     else:
-        form = IndividualProfileForm(instance=profile)
+        form = IndividualProfileForm(instance=profile, user=request.user)
 
     return render(request, 'edit_individual_profile.html', {'form': form})
 
@@ -540,12 +548,15 @@ def myportfolio(request):
     })
 
 
+from django.shortcuts import render, redirect
+from .models import Job
+
 def all_jobs(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
     jobs = Job.objects.filter(company_user=request.user)
-    
+
     # Get the job_id from URL parameters
     selected_job_id = request.GET.get('job_id')
     
@@ -553,6 +564,7 @@ def all_jobs(request):
         'jobs': jobs,
         'selected_job_id': selected_job_id
     })
+
 
 def all_projects(request):
     if not request.user.is_authenticated:
@@ -1093,3 +1105,9 @@ def delete_opportunity(request, pk):
         messages.error(request, "You are not authorized to delete this opportunity.")
 
     return redirect('core') 
+
+
+@login_required
+def resume_database(request):
+    profiles = IndividualProfile.objects.exclude(resume="")  # Filter profiles with a resume uploaded
+    return render(request, 'resume_database.html', {'profiles': profiles})

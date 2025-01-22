@@ -92,7 +92,7 @@
 
             <!-- Ideas Section -->
             <section id="ideas">
-                <h3>Ideas You Have Submitted</h3>
+                <h3>Ideas </h3>
                 <div class="cards-container">
                     {% for idea in ideas %}
                         <div class="card">
@@ -164,15 +164,46 @@
 
             <!-- Internships Section -->
             <section id="internships">
-                <a href="#"><h3>Internships</h3></a>
-                <div class="cards-container" id="internships-container"></div>
+                <a href="{% url 'all_internships' %}"><h3>Internships</h3></a>
+                <div class="cards-container">
+                    {% for internship in recent_internships %}
+                        <div class="card" onclick="window.location.href='{% url 'all_internships' %}?internship_id={{ internship.id }}';" style="cursor: pointer;">
+                            <h4>{{ internship.title }}</h4>
+                            <p><strong>Company:</strong> {{ internship.company.name }}</p>  <!-- Assuming the internship has a related company -->
+                            <p><strong>Location:</strong> {{ internship.location }}</p>
+                            <p><strong>Duration:</strong> {{ internship.duration }}</p>
+                            <p>{{ internship.description|truncatewords:20 }}</p>
+                            <p><strong>Skills Required:</strong> {{ internship.skills_required }}</p>
+                            <p class="posted-date">Posted: {{ internship.posted_date|date:"M d, Y" }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No internships available at the moment.</p>
+                    {% endfor %}
+                </div>
             </section>
+            
 
             <!-- Startups Section -->
             <section id="startups">
-                <h3>Become a core member of startups</h3>
-                <div class="cards-container" id="startups-container"></div>
+                <a href="{% url 'core' %}"><h3>Become a Core Member of Startups</h3></a>
+                <div class="cards-container">
+                    {% for opportunity in other_opportunities %}
+                        <div class="card" onclick="window.location.href='{% url 'core' %}?opportunity_id={{ opportunity.id }}';" style="cursor: pointer;">
+                        <div class="card">
+                            <h4>{{ opportunity.title }}</h4>
+                            <p><strong>Startup:</strong> {{ opportunity.startup_name }}</p>  <!-- Assuming the opportunity has a related startup -->
+                            <p><strong>Location:</strong> {{ opportunity.location }}</p>
+                            <p><strong>Role:</strong> {{ opportunity.role }}</p>
+                            <p>{{ opportunity.description|truncatewords:20 }}</p>
+                            <p><strong>Skills Required:</strong> {{ opportunity.skills_required }}</p>
+                            <p class="posted-date">Posted: {{ opportunity.posted_date|date:"M d, Y" }}</p>
+                        </div>
+                    {% empty %}
+                        <p>No startup opportunities available at the moment.</p>
+                    {% endfor %}
+                </div>
             </section>
+            
         </div>
     </div>
 </body>
