@@ -55,23 +55,6 @@
             margin-bottom: 20px;
         }
 
-        .post-requirement {
-            display: flex;
-            gap: 10px;
-        }
-
-        .post-button {
-            background-color: #3498db;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
-
-        .post-button:hover {
-            background-color: #2980b9;
-        }
     </style>
 </head>
 <body>
@@ -87,7 +70,9 @@
             <div class="header-row">
                 <h2>Idea & Investment</h2>
                 <div class="post-requirement">
-                    <a href="{% url 'ideaform' %}" class="post-button">+ Post an Idea</a>
+                    <a href="{% url 'ideaform' %}" class="post-button" >+ Post an Idea</a>
+                </div>
+                <div class="post-requirement">
                     <a href="{% url 'ideasandinvest' %}" class="post-button">My Portfolio</a>
                 </div>
             </div>

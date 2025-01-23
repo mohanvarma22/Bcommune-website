@@ -6,22 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Portfolio</title>
     <link rel="stylesheet" href="{% static 'css/common.css' %}">
-    
 </head>
 <body>
-
     <style>
         /* Job and Project Cards Container */
-        
-        .job-cards-container, .project-cards-container, .idea-cards-container {
+        .job-cards-container, .project-cards-container, .idea-cards-container, .internship-cards-container, .freelance-cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr); /* Adjusted for 3 cards per row */
             gap: 20px;
             padding: 20px;
         }
 
         /* Common Card Styles */
-        .job-card, .project-card, .idea-card {
+        .job-card, .project-card, .idea-card, .internship-card, .freelance-card {
             background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -29,7 +26,7 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .job-card:hover, .project-card:hover, .idea-card:hover {
+        .job-card:hover, .project-card:hover, .idea-card:hover, .internship-card:hover, .freelance-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
@@ -53,7 +50,7 @@
             color: white;
         }
 
-        .card-header .company {
+        .card-header .company, .card-header .category {
             margin: 5px 0 0;
             font-size: 14px;
             color: white;
@@ -77,7 +74,7 @@
             font-size: 14px;
         }
 
-        .location, .visibility {
+        .location, .visibility, .duration {
             font-weight: bold;
             color: #007bff;
             display: flex;
@@ -85,7 +82,7 @@
             gap: 5px;
         }
 
-        .salary, .funding {
+        .salary, .funding, .stipend, .budget {
             font-weight: bold;
             color: #28a745;
             display: flex;
@@ -94,17 +91,17 @@
         }
 
         /* Requirements or Description Section */
-        .requirements, .description {
+        .requirements, .description, .skills {
             margin-top: 15px;
         }
 
-        .requirements h4, .description h4 {
+        .requirements h4, .description h4, .skills h4 {
             margin: 0 0 5px;
             font-size: 16px;
             color: #444;
         }
 
-        .requirements p, .description p {
+        .requirements p, .description p, .skills p {
             font-size: 14px;
             color: #666;
             line-height: 1.6;
@@ -121,7 +118,7 @@
         }
 
         /* No Content Message */
-        .no-jobs, .no-projects, .no-ideas {
+        .no-jobs, .no-projects, .no-ideas, .no-internships, .no-freelance-projects {
             text-align: center;
             color: #888;
             font-size: 16px;
@@ -129,75 +126,49 @@
         }
 
         /* Section Headers */
-        .portfolio-jobs h2, .portfolio-projects h2, .portfolio-ideas h2 {
+        .portfolio-jobs h2, .portfolio-projects h2, .portfolio-ideas h2, .portfolio-internships h2, .portfolio-freelance h2 {
             padding: 2%;
             font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
             color: #1a2734;
             margin-bottom: 0;
         }
 
-        /* Card Links */
-        a[style*="text-decoration: none"] {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        /* Main Container Layout */
-        .main-container {
-            display: flex;
-            min-height: 100vh;
-            background-color: #1a2734;
-        }
-
-        .content {
-            flex: 1;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
-            .job-cards-container, .project-cards-container, .idea-cards-container {
+            .job-cards-container, .project-cards-container, .idea-cards-container, .internship-cards-container, .freelance-cards-container {
                 grid-template-columns: 1fr;
             }
-            
+
             .card-header {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .card-header .header-image {
                 margin-top: 10px;
             }
         }
-
-        </style>
-   
+    </style>
 
     {% include 'header2.html' %}
-    
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Left Sidebar -->
-        {% include 'sidebarcompany.html' %}
 
-        <!-- Main Content -->
+    <div class="main-container">
+        {% include 'sidebarcompany.html' %}
         <div class="content">
+            <!-- Jobs Section -->
             <section class="portfolio-jobs">
-                <a href="{% url 'all_jobs' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;"> Jobs Posted </h2></a>
+                <a href="{% url 'all_jobs' %}"><h2>Jobs Posted</h2></a>
                 <div class="job-cards-container">
                     {% if jobs %}
                         {% for job in jobs %}
                             <a href="{% url 'all_jobs' %}?job_id={{ job.id }}" style="text-decoration: none; color: inherit;">
-                                <div class="job-card" onclick="selectJobCard({{ job.id }})">
+                                <div class="job-card">
                                     <div class="card-header">
                                         <div class="header-content">
                                             <h3>{{ job.title }}</h3>
                                             <p class="company">{{ job.company }}</p>
                                         </div>
-                                        <img src="{% static 'images/B.png' %}" alt="{{ job.company }} Logo" class="header-image" style="border-radius: 50%;">
+                                        <img src="{% static 'images/B.png' %}" alt="{{ job.company }} Logo" class="header-image">
                                     </div>
                                     <div class="card-body">
                                         <p class="location">📍 {{ job.location }}</p>
@@ -216,147 +187,107 @@
                     {% endif %}
                 </div>
             </section>
-            
-            <!-- Projects Section -->
-<section class="portfolio-projects">
-    <a href="{% url 'all_projects' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Projects Posted </h2></a>
-    <div class="project-cards-container">
-        {% if projects %}
-            {% for project in projects %}
-                <a href="{% url 'all_projects' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
-                    <div class="job-card">  <!-- Using job-card class for consistent styling -->
-                        <div class="card-header">
-                            <div class="header-content">
-                                <h3>{{ project.title }}</h3>
-                                <p class="company">{{ project.project_type }}</p>
-                            </div>
-                            <img src="{% static 'images/B.png' %}" alt="Project Logo" class="header-image" style="border-radius: 50%;">
-                        </div>
-                        <div class="card-body">
-                            <p class="location">📍 {{ project.location|default:"Remote" }}</p>
-                            <p class="salary">💰 ${{ project.budget }}</p>
-                            <div class="requirements">
-                                <h4>Description:</h4>
-                                <p>{{ project.description|truncatechars:100 }}</p>
-                            </div>
-                        </div>
-                        <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
-                    </div>
-                </a>
-            {% endfor %}
-        {% else %}
-            <p class="no-jobs">No projects available in the portfolio.</p>
-        {% endif %}
-    </div>
-</section>
-<section class="portfolio-ideas">
-    <a href="{% url 'all_ideas' %}"><h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">All Posted Ideas</h2></a>
-    <div class="idea-cards-container">
-        {% if ideas %}
-            {% for idea in ideas %}
-                <a href="{% url 'all_ideas' %}?idea_id={{ idea.id }}" style="text-decoration: none; color: inherit;">
-                    <div class="job-card">
-                        <div class="card-header">
-                            <div class="header-content">
-                                <h3>{{ idea.title }}</h3>
-                                <p class="company">{{ idea.category }}</p>
-                            </div>
-                            {% if idea.photo %}
-                                <img src="{{ idea.photo.url }}" alt="Idea Image" class="header-image" style="border-radius: 50%;">
-                            {% else %}
-                                <img src="{% static 'images/B.png' %}" alt="Default Image" class="header-image" style="border-radius: 50%;">
-                            {% endif %}
-                        </div>
-                        <div class="card-body">
-                            <p class="visibility">🔒 {{ idea.visibility|title }}</p>
-                            {% if idea.fund %}
-                                <p class="funding">💰 ${{ idea.fund }}</p>
-                            {% endif %}
-                            <div class="requirements">
-                                <h4>Description:</h4>
-                                <p>{{ idea.brief_description|truncatechars:100 }}</p>
-                            </div>
-                        </div>
-                        <p class="posted-date">Posted: {{ idea.created_at|date:"M d, Y" }}</p>
-                    </div>
-                </a>
-            {% endfor %}
-        {% else %}
-            <p class="no-ideas">No ideas available.</p>
-        {% endif %}
-    </div>
-</section>
-<section class="portfolio-internships">
-    <a href="{% url 'all_internships' %}?internship_id={{ internship.id }}">
-        <h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Internships Posted</h2>
-    </a>
-    <div class="internship-cards-container">
-        {% if internships %}
-            {% for internship in internships %}
-            <a href="{% url 'all_internships' %}?internship_id={{ internship.id }}" style="text-decoration: none; color: inherit;">
-                <div class="internship-card">
-                    <div class="card-header">
-                        <div class="header-content">
-                            <h3>{{ internship.title }}</h3>
-                            <p class="company">{{ internship.company }}</p>
-                        </div>
-                        <img src="{% static 'images/B.png' %}" alt="{{ internship.company }} Logo" class="header-image" style="border-radius: 50%;">
-                    </div>
-                    <div class="card-body">
-                        <p class="location">📍 {{ internship.location }}</p>
-                        <p class="stipend">💰 {{ internship.stipend }}</p>
-                        <div class="requirements">
-                            <h4>Requirements:</h4>
-                            <p>{{ internship.requirements }}</p>
-                        </div>
-                    </div>
-                    <p class="posted-date">Posted: {{ internship.posted_date|date:"M d, Y" }}</p>
-                </div>
-            </a>
-            {% endfor %}
-        {% else %}
-            <p class="no-internships">No internships available in the portfolio.</p>
-        {% endif %}
-    </div>
-</section>
-<section class="portfolio-freelance">
-    <a href="{% url 'all_freelance_projects_company' %}">
-        <h2 style="padding: 2%; font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;">Recent Freelance Projects</h2>
-    </a>
-    <div class="freelance-cards-container">
-        {% if freelance_projects %}
-            {% for project in freelance_projects|slice:":3" %}
-                {% if project.company == request.user.company %}  <!-- Assuming you have a company field in FreelanceProject model -->
-                    <a href="{% url 'all_freelance_projects_company' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
-                        <div class="freelance-card">
-                            <div class="card-header">
-                                <div class="header-content">
-                                    <h3>{{ project.title }}</h3>
-                                    <p class="category">{{ project.category }}</p>
-                                </div>
-                                <img src="{% static 'images/B.png' %}" alt="Company Logo" class="header-image" style="border-radius: 50%;">
-                            </div>
-                            <div class="card-body">
-                                <p class="location">📍 {{ project.location_preference|default:"Remote" }}</p>
-                                <p class="budget">💰 ${{ project.budget }}</p>
-                                <p class="duration">⏱️ {{ project.duration }}</p>
-                                <div class="skills">
-                                    <h4>Skills Required:</h4>
-                                    <p>{{ project.skills_required }}</p>
-                                </div>
-                            </div>
-                            <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
-                        </div>
-                    </a>
-                {% endif %}
-            {% empty %}
-                <p class="no-projects">No freelance projects posted yet.</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-</section>
-        </div>
-    </div>
 
+            <!-- Projects Section -->
+            <section class="portfolio-projects">
+                <a href="{% url 'all_projects' %}"><h2>Projects Posted</h2></a>
+                <div class="project-cards-container">
+                    {% if projects %}
+                        {% for project in projects %}
+                            <a href="{% url 'all_projects' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
+                                <div class="project-card">
+                                    <div class="card-header">
+                                        <div class="header-content">
+                                            <h3>{{ project.title }}</h3>
+                                            <p class="category">{{ project.project_type }}</p>
+                                        </div>
+                                        <img src="{% static 'images/B.png' %}" alt="Project Logo" class="header-image">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="location">📍 {{ project.location|default:"Remote" }}</p>
+                                        <p class="budget">💰 ${{ project.budget }}</p>
+                                        <div class="description">
+                                            <h4>Description:</h4>
+                                            <p>{{ project.description|truncatechars:100 }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-projects">No projects available in the portfolio.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Internships Section -->
+            <section class="portfolio-internships">
+                <a href="{% url 'all_internships' %}"><h2>Internships Posted</h2></a>
+                <div class="internship-cards-container">
+                    {% if internships %}
+                        {% for internship in internships %}
+                            <a href="{% url 'all_internships' %}?internship_id={{ internship.id }}" style="text-decoration: none; color: inherit;">
+                                <div class="internship-card">
+                                    <div class="card-header">
+                                        <div class="header-content">
+                                            <h3>{{ internship.title }}</h3>
+                                            <p class="company">{{ internship.company }}</p>
+                                        </div>
+                                        <img src="{% static 'images/B.png' %}" alt="{{ internship.company }} Logo" class="header-image">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="location">📍 {{ internship.location }}</p>
+                                        <p class="stipend">💰 {{ internship.stipend }}</p>
+                                        <div class="requirements">
+                                            <h4>Requirements:</h4>
+                                            <p>{{ internship.requirements }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="posted-date">Posted: {{ internship.posted_date|date:"M d, Y" }}</p>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-internships">No internships available in the portfolio.</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Freelance Projects Section -->
+            <section class="portfolio-freelance">
+                <a href="{% url 'all_freelance_projects_company' %}"><h2>Recent Freelance Projects</h2></a>
+                <div class="freelance-cards-container">
+                    {% if freelance_projects %}
+                        {% for project in freelance_projects|slice:":3" %}
+                            <a href="{% url 'all_freelance_projects_company' %}?project_id={{ project.id }}" style="text-decoration: none; color: inherit;">
+                                <div class="freelance-card">
+                                    <div class="card-header">
+                                        <div class="header-content">
+                                            <h3>{{ project.title }}</h3>
+                                            <p class="category">{{ project.category }}</p>
+                                        </div>
+                                        <img src="{% static 'images/B.png' %}" alt="Company Logo" class="header-image">
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="location">📍 {{ project.location_preference|default:"Remote" }}</p>
+                                        <p class="budget">💰 ${{ project.budget }}</p>
+                                        <p class="duration">⏱ {{ project.duration }}</p>
+                                        <div class="skills">
+                                            <h4>Skills Required:</h4>
+                                            <p>{{ project.skills_required }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="posted-date">Posted: {{ project.created_at|date:"M d, Y" }}</p>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-freelance-projects">No freelance projects posted yet.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
 </body>
 </html>

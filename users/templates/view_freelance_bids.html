@@ -7,6 +7,106 @@
     <title>Bids for {{ project.title }}</title>
 </head>
 <body>
+    <style>/* General Body Styling */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f9;
+        color: #333;
+        line-height: 1.6;
+    }
+    
+    /* Header Styling */
+    h1, h2 {
+        text-align: center;
+        color: #1a2734;
+    }
+    
+    h1 {
+        margin-bottom: 10px;
+    }
+    
+    p {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+    
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+    }
+    
+    table th, table td {
+        border: 1px solid #dddddd;
+        padding: 10px;
+        text-align: left;
+    }
+    
+    table th {
+        background-color: #1a2734;
+        color: white;
+        font-weight: bold;
+    }
+    
+    table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    table tr:hover {
+        background-color: #f1f1f1;
+    }
+    
+    /* Link Styling */
+    a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    
+    a:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+    
+    /* Back to Projects Link */
+    a[href*='all_freelance_projects_company'] {
+        display: block;
+        margin: 20px auto;
+        text-align: center;
+        padding: 10px 20px;
+        background-color: #1a2734;
+        color: white;
+        border-radius: 5px;
+        width: fit-content;
+        transition: background-color 0.3s ease;
+    }
+    
+    a[href*='all_freelance_projects_company']:hover {
+        background-color: #155ab7;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+    
+        table th, table td {
+            padding: 8px;
+        }
+    
+        a[href*='all_freelance_projects_company'] {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+    }
+    </style>
     <h1>Bids for Project: {{ project.title }}</h1>
     <p><strong>Description:</strong> {{ project.description }}</p>
     <p><strong>Budget:</strong> {{ project.budget }}</p>
