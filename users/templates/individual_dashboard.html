@@ -334,7 +334,7 @@
                             <!-- Card Body -->
                             <div class="card-body">
                                 <p><strong>Location:</strong> {{ job.location }}</p>
-                                <p>{{ job.description }}</p>
+                                <p>{{ job.description|truncatewords:20  }}</p>
                                 <p><strong>Requirements:</strong></p>
                                 <p>{{ job.requirements }}</p>
                                 <p class="posted-date">Posted: {{ job.posted_date|date:'M d, Y' }}</p>
