@@ -193,6 +193,17 @@
                                 <a href="{% url 'apply_job' job.id %}" class="apply-btn">
                                     Apply Now
                                 </a>
+                                <form action="{% url 'toggle_bookmark' 'job' job.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit">
+                                        {% if job.id in bookmarked_jobs %}
+                                            ❌ Unsave
+                                        {% else %}
+                                            ⭐ Save
+                                        {% endif %}
+                                    </button>
+                                </form>
+                                
                             </div>
                             
                         </div>

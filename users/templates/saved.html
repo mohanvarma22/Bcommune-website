@@ -1,0 +1,51 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>My Saved Items</h2>
+
+  {% if grouped_items %}
+    {% for model, items in grouped_items.items %}
+      <h3>
+        {% if model == 'job' %}
+          Saved Jobs
+        {% elif model == 'internship' %}
+          Saved Internships
+        {% elif model == 'idea' %}
+          Saved Ideas
+        {% elif model == 'freelanceproject' %}
+          Saved Freelance Projects
+        {% else %}
+          Saved {{ model|capfirst }}s
+        {% endif %}
+      </h3>
+      <ul>
+        {% for item in items %}
+          <li>
+            <!-- Adjust display as needed. For example: -->
+            {% if model == 'job' %}
+              <a href="{% url 'job_detail' item.id %}">{{ item.title }} at {{ item.company }}</a>
+            {% elif model == 'internship' %}
+              <a href="{% url 'internship_detail' item.id %}">{{ item.title }} at {{ item.company }}</a>
+            {% elif model == 'idea' %}
+              <a href="{% url 'idea_detail' item.id %}">{{ item.title }}</a>
+            {% elif model == 'freelanceproject' %}
+              <a href="{% url 'freelanceproject_detail' item.id %}">{{ item.title }}</a>
+            {% else %}
+              {{ item }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  {% else %}
+    <p>You have not saved any items yet.</p>
+  {% endif %}
+    
+</body>
+</html>

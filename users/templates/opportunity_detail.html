@@ -130,7 +130,19 @@
                 class="connect-button">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12.713l-11.999-7.713 24-.001-12.001 7.714zm12 1.543v7.744h-24v-7.744l12 7.729 12-7.729zm-24-9.256v-3h24v3l-12 7.714-12-7.714z"/></svg>
                 Connect
+
             </a>
+            <form action="{% url 'toggle_bookmark' 'core_opportunity' core_opportunity.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit">
+                    {% if bookmarked %}
+                        ❌ Unsave
+                    {% else %}
+                        ⭐ Save
+                    {% endif %}
+                </button>
+            </form>
+            
         {% endif %}
     </div>
 </body>

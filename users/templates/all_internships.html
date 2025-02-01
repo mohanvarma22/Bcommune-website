@@ -178,6 +178,9 @@
                         <a href="#" class="action-btn delete-btn" onclick="confirmDelete('{{ internship.id }}'); return false;">
                             Delete Internship
                         </a>
+                        <a href="{% url 'view_internship_applications' internship.id %}" class="action-btn view-btn">
+                            View Applications
+                        </a>
                     </div>
                 </div>
             {% endfor %}

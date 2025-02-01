@@ -1,0 +1,353 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Applications</title>
+    <!-- Include your CSS files here if needed -->
+    <style>
+        /* Basic styling for email modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .email-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .preview-btn {
+            background: #6c757d;
+            color: white;
+        }
+        .send-btn {
+            background: #28a745;
+            color: white;
+        }
+        /* Email button styling */
+        .email-btns {
+            margin-top: 10px;
+        }
+        .email-btn {
+            margin-right: 10px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quick-email-btn {
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+        }
+        .compose-email-btn {
+            background-color: #17a2b8;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Internship Applications for "{{ internship.title }}"</h2>
+        
+        <!-- Filter Dropdown -->
+        <div class="mb-3">
+            <label for="filter-status"><strong>Filter by Status:</strong></label>
+            <select id="filter-status" class="form-control" onchange="filterApplications(this.value)">
+                <option value="all" {% if filter_status == 'all' %}selected{% endif %}>All</option>
+                <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="shortlisted" {% if filter_status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+                <option value="reviewed" {% if filter_status == 'reviewed' %}selected{% endif %}>Reviewed</option>
+                <option value="rejected" {% if filter_status == 'rejected' %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+
+        <div class="row">
+            {% for application in applications %}
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ application.name }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ application.internship.title }}</h6>
+                            <p><strong>Email:</strong> {{ application.email }}</p>
+                            <p><strong>Phone:</strong> {{ application.phone_number }}</p>
+                            <p><strong>Degree:</strong> {{ application.get_degree_display }}</p>
+                            <p><strong>Experience:</strong> {{ application.work_experience }} years</p>
+                            <p><strong>Match Score:</strong> {{ application.match_score }}%</p>
+                            <p><strong>Matching Skills:</strong> {{ application.matching_skills|join:", " }}</p>
+                            <p><strong>Missing Skills:</strong> {{ application.missing_skills|join:", " }}</p>
+                            <p>
+                                <strong>Status:</strong> 
+                                <span class="badge badge-info">{{ application.get_status_display }}</span>
+                            </p>
+                            <a href="{{ application.resume.url }}" class="btn btn-primary btn-sm" target="_blank">View Resume</a>
+
+                            <!-- Email Buttons -->
+                            <div class="email-btns">
+                                <!-- Quick Email (opens user's default email client) -->
+                                <a href="mailto:{{ application.email }}?subject=Regarding your application for {{ internship.title }}&body=Dear {{ application.name }},%0D%0A%0D%0AThank you for applying for the internship. We will review your application and get back to you soon.%0D%0A%0D%0ABest regards," 
+                                   class="email-btn quick-email-btn">
+                                    Quick Email
+                                </a>
+                                <!-- Compose Email (opens modal for custom message) -->
+                                <button class="email-btn compose-email-btn" onclick="openEmailModal('{{ application.email }}', '{{ application.name }}', '{{ internship.title }}')">
+                                    Compose Email
+                                </button>
+                            </div>
+
+                            <!-- Save Applicant Dropdown -->
+                            <div class="mt-3">
+                                <label for="save-applicant-{{ application.id }}"><strong>Save Applicant:</strong></label>
+                                <select id="save-applicant-{{ application.id }}" class="form-control" onchange="saveApplicant({{ application.id }}, this.value)">
+                                    <option value="">Select Option</option>
+                                    <option value="shortlisted">Shortlisted</option>
+                                    <option value="reviewed">Reviewed</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No applications found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEmailModal()">&times;</span>
+            <h2>Compose Email</h2>
+            <form id="emailForm" class="email-form">
+                <div class="form-group">
+                    <label for="emailTemplate">Template:</label>
+                    <select id="emailTemplate" onchange="loadTemplate()">
+                        <option value="">Select Template</option>
+                        <option value="interview">Interview Invitation</option>
+                        <option value="followup">Follow-up</option>
+                        <option value="rejection">Rejection</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailTo">To:</label>
+                    <input type="email" id="emailTo" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailSubject">Subject:</label>
+                    <input type="text" id="emailSubject">
+                </div>
+
+                <div class="form-group">
+                    <label for="emailBody">Message:</label>
+                    <textarea id="emailBody"></textarea>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn preview-btn" onclick="previewEmail()">Preview</button>
+                    <button type="button" class="modal-btn send-btn" onclick="sendEmail()">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to update the URL query parameter for filtering
+        function filterApplications(status) {
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('filter_status', status);
+            window.location.search = urlParams.toString();
+        }
+
+        // Function to send AJAX request to update applicant status
+        function saveApplicant(applicationId, status) {
+            if (!status) return;
+            fetch(`/save-applicant/${applicationId}/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Applicant status updated successfully!");
+                    location.reload(); // Optionally reload the page to reflect changes
+                } else {
+                    alert("Failed to update status: " + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Helper function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Email template definitions
+        const emailTemplates = {
+            interview: {
+                subject: "Interview Invitation - {internshipTitle}",
+                body: `Dear {name},
+
+Thank you for applying for the {internshipTitle} internship. We were impressed with your application and would like to invite you for an interview.
+
+Please let us know your availability.
+
+Best regards,
+Recruitment Team`
+            },
+            followup: {
+                subject: "Follow-up - {internshipTitle} Application",
+                body: `Dear {name},
+
+Thank you for your patience regarding your application for the {internshipTitle} internship. We are still in the process of reviewing applications and will get back to you soon.
+
+Best regards,
+Recruitment Team`
+            },
+            rejection: {
+                subject: "Update on your {internshipTitle} Application",
+                body: `Dear {name},
+
+Thank you for applying for the {internshipTitle} internship. After careful consideration, we regret to inform you that we will not be progressing with your application at this time.
+
+We appreciate your interest and wish you success in your future endeavors.
+
+Best regards,
+Recruitment Team`
+            }
+        };
+
+        // Modal functions
+        function openEmailModal(email, name, internshipTitle) {
+            const modal = document.getElementById('emailModal');
+            const emailTo = document.getElementById('emailTo');
+            // Store data on the modal for template usage
+            modal.dataset.name = name;
+            modal.dataset.internshipTitle = internshipTitle;
+            
+            emailTo.value = email;
+            modal.style.display = 'block';
+        }
+
+        function closeEmailModal() {
+            const modal = document.getElementById('emailModal');
+            modal.style.display = 'none';
+            document.getElementById('emailForm').reset();
+        }
+
+        function loadTemplate() {
+            const template = document.getElementById('emailTemplate').value;
+            if (!template) return;
+            const modal = document.getElementById('emailModal');
+            const name = modal.dataset.name;
+            const internshipTitle = modal.dataset.internshipTitle;
+            const selectedTemplate = emailTemplates[template];
+            
+            document.getElementById('emailSubject').value = selectedTemplate.subject.replace('{internshipTitle}', internshipTitle);
+            document.getElementById('emailBody').value = selectedTemplate.body
+                .replace('{name}', name)
+                .replace('{internshipTitle}', internshipTitle);
+        }
+
+        function previewEmail() {
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const previewWindow = window.open('', '_blank');
+            previewWindow.document.write(`
+                <html>
+                <head>
+                    <title>Email Preview</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .preview-container { max-width: 600px; margin: 0 auto; }
+                        .preview-subject { font-weight: bold; margin-bottom: 20px; }
+                        .preview-body { white-space: pre-wrap; }
+                    </style>
+                </head>
+                <body>
+                    <div class="preview-container">
+                        <div class="preview-subject">Subject: ${subject}</div>
+                        <div class="preview-body">${body}</div>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        function sendEmail() {
+            const to = document.getElementById('emailTo').value;
+            const subject = document.getElementById('emailSubject').value;
+            const body = document.getElementById('emailBody').value;
+            const encodedBody = encodeURIComponent(body);
+            const mailtoLink = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodedBody}`;
+            window.location.href = mailtoLink;
+            closeEmailModal();
+        }
+    </script>
+</body>
+</html>

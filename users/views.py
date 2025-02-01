@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.decorators import login_required
-from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication,LikeDislike
+from .models import Idea, Job, Project, CustomUser, IndividualProfile, Bid, Internship,FreelanceProject, FreelanceBid, JobApplication, JobMatcher, SavedApplication,LikeDislike,Bookmark
 from users.forms import CompanySignupForm, IndividualSignupForm,IndividualProfileForm, CompanyProfileForm, BidForm,FreelanceProjectForm,FreelanceBidForm,JobApplicationForm,OpportunityForm
 from django.contrib.auth import logout
 from django.http import JsonResponse
@@ -845,19 +845,49 @@ def view_freelance_bids(request, project_id):
         'bids': bids,
     })
 
+@login_required
 def individual_alljobs(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
-    # Fetch all jobs and order by most recent first
-    jobs = Job.objects.all().order_by('-posted_date')  # Assuming `posted_date` is the field for job posting date
-
-    # Get the job_id from URL parameters (if any)
+    jobs = Job.objects.all().order_by('-posted_date')
     selected_job_id = request.GET.get('job_id')
+
+    # Fetch bookmarked job IDs for the logged-in user
+    bookmarked_jobs = Bookmark.objects.filter(user=request.user).values_list('job_id', flat=True)
 
     return render(request, 'individual_alljobs.html', {
         'jobs': jobs,
-        'selected_job_id': selected_job_id
+        'selected_job_id': selected_job_id,
+        'bookmarked_jobs': list(bookmarked_jobs)
+    })
+
+
+@login_required
+def toggle_bookmark(request, item_type, item_id):
+    """Toggle bookmark for jobs, internships, and core opportunities"""
+    if item_type == "job":
+        item = get_object_or_404(Job, id=item_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, job=item)
+    
+    elif item_type == "internship":
+        item = get_object_or_404(Internship, id=item_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, internship=item)
+    
+    elif item_type == "core_opportunity":
+        item = get_object_or_404(CoreOpportunity, id=item_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, core_opportunity=item)
+    
+    else:
+        return redirect('individual_alljobs')
+
+    if not created:
+        bookmark.delete()  # Unsave if already saved
+
+    return redirect(request.META.get('HTTP_REFERER', 'individual_alljobs'))
+@login_required
+def bookmarked_items(request):
+    bookmarks = Bookmark.objects.filter(user=request.user)
+
+    return render(request, 'bookmarks.html', {
+        'bookmarks': bookmarks
     })
 
 def individual_allinternships(request):
@@ -1240,3 +1270,50 @@ def apply_internship(request, internship_id):
 
 def internship_success(request):
     return render(request, 'internship_success.html')
+
+from django.views.decorators.csrf import csrf_exempt
+from .models import Internship, InternshipApplication
+from .job_matcher import InternshipMatcher
+
+def view_internship_applications(request, internship_id):
+    internship = get_object_or_404(Internship, id=internship_id)
+    filter_status = request.GET.get('filter_status', 'all')
+    applications = InternshipApplication.objects.filter(internship=internship)
+    
+    if filter_status and filter_status != 'all':
+        applications = applications.filter(status=filter_status)
+    
+    matcher = InternshipMatcher()
+    for app in applications:
+        match_result = matcher.calculate_match(app, internship)
+        # Update the application object with matching details (you may also save match_score if desired)
+        app.match_score = match_result['overall_score']
+        # Attach additional attributes for use in the template:
+        app.matching_skills = match_result['matching_skills']
+        app.missing_skills = match_result['missing_skills']
+
+    context = {
+        'internship': internship,
+        'applications': applications,
+        'filter_status': filter_status
+    }
+    return render(request, 'view_internship_applications.html', context)
+
+@csrf_exempt
+def save_applicant(request, application_id):
+    """View to update an applicant’s status via AJAX."""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            new_status = data.get("status")
+            application = InternshipApplication.objects.get(id=application_id)
+            # Validate that the status is one of the allowed values
+            if new_status not in ['shortlisted', 'reviewed', 'rejected']:
+                return JsonResponse({"success": False, "error": "Invalid status."})
+            application.status = new_status
+            application.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request method."})
+

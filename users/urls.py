@@ -78,6 +78,10 @@ urlpatterns = [
      path('individual/dashboard/individual_allinternships/', views.individual_allinternships, name='individual_allinternships'),
      path('individual/dashboard/individual_allinternships/apply-internship/<int:internship_id>/', views.apply_internship, name='apply_internship'),
      path('internship-success/', views.internship_success, name='internship_success'),
+     path('internship-applications/<int:internship_id>/', views.view_internship_applications, name='view_internship_applications'),
+     path('save-applicant/<int:application_id>/', views.save_applicant, name='save_applicant'),
+     path('bookmark/<str:item_type>/<int:item_id>/', views.toggle_bookmark, name='toggle_bookmark'),
+    path('bookmarks/', views.bookmarked_items, name='bookmarked_items'),
 ]
 
 if settings.DEBUG:

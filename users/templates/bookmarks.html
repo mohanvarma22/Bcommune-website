@@ -1,0 +1,42 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Bookmarked Items</h2>
+
+    <div class="container">
+        {% for bookmark in bookmarks %}
+            <div class="job-card">
+                {% if bookmark.job %}
+                    <div class="job-title">{{ bookmark.job.title }}</div>
+                    <div class="job-company">{{ bookmark.job.company }}</div>
+                    <div class="job-location">📍 {{ bookmark.job.location }}</div>
+                    <a href="{% url 'individual_alljobs' %}?job_id={{ bookmark.job.id }}">View Details</a>
+                {% elif bookmark.internship %}
+                    <div class="job-title">{{ bookmark.internship.title }}</div>
+                    <div class="job-company">{{ bookmark.internship.company }}</div>
+                    <div class="job-location">📍 {{ bookmark.internship.location }}</div>
+                    <a href="{% url 'internship_list' %}?internship_id={{ bookmark.internship.id }}">View Details</a>
+                {% elif bookmark.core_opportunity %}
+                    <div class="job-title">{{ bookmark.core_opportunity.title }}</div>
+                    <div class="job-company">{{ bookmark.core_opportunity.organization }}</div>
+                    <div class="job-location">📍 {{ bookmark.core_opportunity.location }}</div>
+                    <a href="{% url 'core_opportunity_list' %}?core_opportunity_id={{ bookmark.core_opportunity.id }}">View Details</a>
+                {% endif %}
+    
+                <form action="{% url 'toggle_bookmark' 'job' bookmark.job.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">❌ Unsave</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>No saved items yet.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
