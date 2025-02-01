@@ -148,27 +148,50 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+from django.db import models
+from django.conf import settings
+
+from django.db import models
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from django.db import models
+from django.conf import settings
+import json
+
 class IndividualProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True) # 3
+    location = models.CharField(max_length=255, blank=True, null=True)
     tagline = models.CharField(max_length=255, blank=True, null=True)
-    availability_status = models.CharField(max_length=50, choices=[
-        ('actively_looking', 'Actively Looking'),
-        ('not_available', 'Not Available'),
-        ('open_to_offers', 'Open to Offers')
-    ], default='open_to_offers') #3
+    
+    availability_status = models.CharField(
+        max_length=50,
+        choices=[
+            ('actively_looking', 'Actively Looking'),
+            ('not_available', 'Not Available'),
+            ('open_to_offers', 'Open to Offers')
+        ],
+        default='open_to_offers'
+    )
     about_me = models.TextField(blank=True, null=True)
-    key_skills = models.JSONField(blank=True, null=True)  # Store as a list of skills 1
-    industries_of_interest = models.JSONField(blank=True, null=True)  # Store as a list 2
+    
+    key_skills = models.TextField(blank=True, null=True, default="[]")
+    industries_of_interest = models.TextField(blank=True, null=True, default="[]")
+    
     desired_role = models.CharField(max_length=255, blank=True, null=True)
     desired_location = models.CharField(max_length=255, blank=True, null=True)
-    work_type = models.CharField(max_length=50, choices=[
-        ('remote', 'Remote'),
-        ('hybrid', 'Hybrid'),
-        ('on_site', 'On-Site')
-    ], default='remote') #4
-    salary_expected = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True) 
+    
+    work_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('remote', 'Remote'),
+            ('hybrid', 'Hybrid'),
+            ('on_site', 'On-Site')
+        ],
+        default='remote'
+    )
+    salary_expected = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     # Work Experience Section
     current_position_title = models.CharField(max_length=255, blank=True, null=True)
@@ -177,23 +200,22 @@ class IndividualProfile(models.Model):
     key_responsibilities = models.TextField(blank=True, null=True)
 
     # Education Section
-    qualification = models.CharField(max_length=255, blank=True, null=True)#5
+    qualification = models.CharField(max_length=255, blank=True, null=True)
     institution = models.CharField(max_length=255, blank=True, null=True)
     year_of_completion = models.IntegerField(blank=True, null=True)
-    certifications = models.JSONField(blank=True, null=True)  # Store as a list 6
+    
+    # Other Sections
+    certifications = models.TextField(blank=True, null=True, default="[]")
+    projects = models.TextField(blank=True, null=True, default="[]")
+    awards = models.TextField(blank=True, null=True, default="[]")
+    publications = models.TextField(blank=True, null=True, default="[]")
+    hobbies = models.TextField(blank=True, null=True, default="[]")
 
-    # Portfolio/Projects Section
-    projects = models.JSONField(blank=True, null=True)  # Store projects as a list of dicts
-
-    # Achievements Section
-    awards = models.JSONField(blank=True, null=True)  # Store awards as a list
-    publications = models.JSONField(blank=True, null=True)  # Store publications as a list
-
-    # Interests Section
-    hobbies = models.JSONField(blank=True, null=True)  # Store as a list
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
     
 class IndividualProfileUpdate(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
