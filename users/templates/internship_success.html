@@ -1,0 +1,18 @@
+<!-- internship_success.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Successful</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+</head>
+<body>
+    <div class="main-container">
+        <h2>Application Submitted Successfully!</h2>
+        <p>Thank you for applying. We will review your application and get back to you soon.</p>
+        <a href="{% url 'individual_allinternships' %}" class="btn">Back to Internships</a>
+    </div>
+</body>
+</html>

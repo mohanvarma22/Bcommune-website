@@ -246,3 +246,58 @@ class OpportunityForm(forms.ModelForm):
             'stage', 'company_mission', 'requirements', 'experience', 
             'commitment', 'future_plans', 'terms', 'nda'
         ]
+
+from .models import InternshipApplication
+
+class InternshipApplicationForm(forms.ModelForm):
+    DEGREE_CHOICES = [
+        ('bachelor', 'Bachelor\'s'),
+        ('master', 'Masters'),
+        ('phd', 'PhD'),
+        ('diploma', 'Diploma'),
+    ]
+
+    phone_number = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+
+    degree = forms.ChoiceField(
+        choices=DEGREE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    percentage = forms.DecimalField(
+        max_digits=5, 
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    work_experience = forms.DecimalField(
+        max_digits=4, 
+        decimal_places=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    resume = forms.FileField(
+        help_text='Upload your resume (PDF format)',
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+
+    skills = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Enter your skills separated by commas'
+        }),
+        help_text="Enter your skills separated by commas"
+    )
+
+    class Meta:
+        model = InternshipApplication
+        fields = ['phone_number', 'email', 'degree', 'percentage', 'work_experience', 'resume', 'skills']

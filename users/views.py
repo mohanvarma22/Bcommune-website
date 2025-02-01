@@ -601,14 +601,17 @@ def post_internship(request):
     if request.method == 'POST':
         try:
             internship = Internship.objects.create(
-                title=request.POST.get('job_title'),  # Matches corrected form
+                title=request.POST.get('job_title'),
                 company=request.POST.get('company_name'),
-                location=request.POST.get('job_location'),  # Matches corrected form
-                description=request.POST.get('job_description'),  # Matches corrected form
+                location=request.POST.get('job_location'),
+                description=request.POST.get('job_description'),
                 requirements=request.POST.get('job_type'),
+                stipend=request.POST.get('salary'),  # Renamed to stipend
                 duration=request.POST.get('duration'),
-                salary=request.POST.get('salary'),
-                company_user=request.user
+                company_user=request.user,
+                required_skills=request.POST.get('required_skills', ''),  # New field
+                min_experience=request.POST.get('min_experience', 0),  # New field
+                required_qualification=request.POST.get('required_qualification', 'bachelor')
             )
             return JsonResponse({'status': 'success', 'message': 'Internship posted successfully!'})
         except Exception as e:
@@ -657,18 +660,21 @@ def delete_internship(request, internship_id):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     
-def edit_internship(request, internship_id):  # Changed parameter name to internship_id
+def edit_internship(request, internship_id):
     internship = get_object_or_404(Internship, id=internship_id, company_user=request.user)
     
     if request.method == 'POST':
         try:
-            internship.title = request.POST.get('job_title')  # Updated with internship variable
+            internship.title = request.POST.get('job_title')
             internship.company = request.POST.get('company_name')
             internship.location = request.POST.get('job_location')
             internship.description = request.POST.get('job_description')
             internship.requirements = request.POST.get('job_type')
             internship.duration = request.POST.get('duration')
-            internship.salary = request.POST.get('salary')
+            internship.stipend = request.POST.get('salary')  # Updated to stipend
+            internship.required_skills = request.POST.get('required_skills', '')
+            internship.min_experience = request.POST.get('min_experience', 0)
+            internship.required_qualification = request.POST.get('required_qualification', 'bachelor')
             internship.save()
             return JsonResponse({'status': 'success', 'message': 'Internship updated successfully!'})
         except Exception as e:
@@ -852,6 +858,21 @@ def individual_alljobs(request):
     return render(request, 'individual_alljobs.html', {
         'jobs': jobs,
         'selected_job_id': selected_job_id
+    })
+
+def individual_allinternships(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    # Fetch all internships and order by most recent first
+    internships = Internship.objects.all().order_by('-posted_date')
+
+    # Get the internship_id from URL parameters (if any)
+    selected_internship_id = request.GET.get('internship_id')
+
+    return render(request, 'individual_allinternships.html', {
+        'internships': internships,
+        'selected_internship_id': selected_internship_id
     })
 
 def apply_job(request, job_id):
@@ -1187,3 +1208,35 @@ def delete_idea(request, idea_id):
         except Idea.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Idea not found or unauthorized'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+from .models import Internship, InternshipApplication
+from .forms import InternshipApplicationForm
+
+@login_required
+def apply_internship(request, internship_id):
+    internship = get_object_or_404(Internship, id=internship_id)
+    
+    initial_data = {
+        'email': request.user.email,
+        'name': f"{request.user.first_name} {request.user.last_name}"
+    }
+    
+    if request.method == 'POST':
+        form = InternshipApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.internship = internship
+            application.user = request.user
+            application.save()
+            messages.success(request, 'You have successfully applied for the internship!')
+            return redirect('internship_success')
+    else:
+        form = InternshipApplicationForm(initial=initial_data)
+        
+    return render(request, 'apply_internship.html', {
+        'internship': internship,
+        'form': form
+    })
+
+def internship_success(request):
+    return render(request, 'internship_success.html')

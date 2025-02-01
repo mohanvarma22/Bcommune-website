@@ -119,14 +119,23 @@ class Internship(models.Model):
     company_user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     location = models.CharField(max_length=200)
     description = models.TextField()
-    requirements = models.CharField(max_length=200)  # or TextField()
-    salary = models.CharField(max_length=200, default="Not Specified") 
+    requirements = models.CharField(max_length=200)
+    stipend = models.CharField(max_length=200, default="Not Specified")  
     duration = models.CharField(max_length=100, default="Not Specified")
     posted_date = models.DateTimeField(default=timezone.now)
-    # Add other fields as needed
+    # New fields for matching
+    required_skills = models.TextField(help_text="Enter required skills separated by commas", default='')
+    min_experience = models.PositiveIntegerField(default=0)
+    required_qualification = models.CharField(max_length=50, default='bachelor', choices=[
+        ('bachelor', 'Bachelors'),
+        ('master', 'Masters'),
+        ('phd', 'PhD'),
+        ('diploma', 'Diploma'),
+    ])
 
     def __str__(self):
         return f"{self.title} at {self.company}"
+
     
 class Project(models.Model):
     company = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -363,7 +372,35 @@ class JobApplication(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.job.title}"
 # your_app/matchers.py
+class InternshipApplication(models.Model):
+    internship = models.ForeignKey('Internship', on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=15)
+    degree = models.CharField(
+        max_length=20,
+        choices=[
+            ('bachelor', 'Bachelor\'s'),
+            ('master', 'Masters'),
+            ('phd', 'PhD'),
+            ('diploma', 'Diploma'),
+        ]
+    )
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    work_experience = models.DecimalField(max_digits=4, decimal_places=1)
+    resume = models.FileField(upload_to='internship_resumes/')
+    skills = models.TextField()
+    applied_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('reviewed', 'Reviewed'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected')
+    ], default='pending')
 
+    def __str__(self):
+        return f"{self.name} - {self.internship.title}"
 from fuzzywuzzy import fuzz
 
 class JobMatcher:

@@ -75,6 +75,9 @@ urlpatterns = [
      path('idea-detail-individual/<int:idea_id>/', views.idea_detail_individual, name='idea_detail_individual'),
      path('myjobs-individual',views.myjobs_individual,name='myjobs_individual'),
      path('delete-idea/<int:idea_id>/', views.delete_idea, name='delete_idea'),
+     path('individual/dashboard/individual_allinternships/', views.individual_allinternships, name='individual_allinternships'),
+     path('individual/dashboard/individual_allinternships/apply-internship/<int:internship_id>/', views.apply_internship, name='apply_internship'),
+     path('internship-success/', views.internship_success, name='internship_success'),
 ]
 
 if settings.DEBUG:

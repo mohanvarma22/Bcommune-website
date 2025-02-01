@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Internship</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <style>
+    .main-container {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    h2 {
+        text-align: center;
+        color: #34495e;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #2c3e50;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .form-control[readonly] {
+        background-color: #f8f8f8;
+        cursor: not-allowed;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        background-color: #1a2734;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: #2980b9;
+    }
+
+    .form-text {
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+
+    /* New alert styles */
+    .alert {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    .alert-error {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    .form-group .errorlist {
+        color: #dc3545;
+        font-size: 12px;
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0;
+    }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h2>Apply for {{ internship.title }}</h2>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" value="{{ user.first_name }} {{ user.last_name }}" class="form-control" readonly>
+                {% if form.name.errors %}
+                <ul class="errorlist">
+                    {% for error in form.name.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {% if form.email.help_text %}
+                    <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                {% endif %}
+                {% if form.email.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.email.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                {{ form.phone_number }}
+                {% if form.phone_number.help_text %}
+                    <small class="form-text text-muted">{{ form.phone_number.help_text }}</small>
+                {% endif %}
+                {% if form.phone_number.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.phone_number.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.degree.id_for_label }}">Degree</label>
+                {{ form.degree }}
+                {% if form.degree.help_text %}
+                    <small class="form-text text-muted">{{ form.degree.help_text }}</small>
+                {% endif %}
+                {% if form.degree.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.degree.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.percentage.id_for_label }}">Percentage</label>
+                {{ form.percentage }}
+                {% if form.percentage.help_text %}
+                    <small class="form-text text-muted">{{ form.percentage.help_text }}</small>
+                {% endif %}
+                {% if form.percentage.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.percentage.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.work_experience.id_for_label }}">Work Experience (Years)</label>
+                {{ form.work_experience }}
+                {% if form.work_experience.help_text %}
+                    <small class="form-text text-muted">{{ form.work_experience.help_text }}</small>
+                {% endif %}
+                {% if form.work_experience.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.work_experience.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.resume.id_for_label }}">Resume</label>
+                {{ form.resume }}
+                {% if form.resume.help_text %}
+                    <small class="form-text text-muted">{{ form.resume.help_text }}</small>
+                {% endif %}
+                {% if form.resume.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.resume.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.skills.id_for_label }}">Skills</label>
+                {{ form.skills }}
+                {% if form.skills.help_text %}
+                    <small class="form-text text-muted">{{ form.skills.help_text }}</small>
+                {% endif %}
+                {% if form.skills.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.skills.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit Application</button>
+        </form>
+    </div>
+</body>
+</html>

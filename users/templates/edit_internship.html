@@ -1,108 +1,130 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+{% load static %}
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Internship</title>
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
 </head>
 <body>
     <style>
 
-/* Header */
-h2 {
-    color: #2c3e50;
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-/* Form Styles */
-.form-group {
-    margin-bottom: 15px;
-}
-
-label {
-    font-size: 16px;
-    color: #34495e;
-    margin-bottom: 5px;
-    display: block;
-}
-
-input[type="text"],
-textarea {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    margin-bottom: 10px;
-}
-
-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-button {
-    background-color: #1a2734;
-    color: #fff;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #16a085;
-}
-
-    </style>
-    {% include 'header2.html' %}
-    <div class="main-container">
-        {% include 'sidebarcompany.html' %}
-        <div class="content">
-            <h2>Edit Internship</h2>
-            <form id="editInternshipForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label>Internship Title:</label>
-                    <input type="text" name="job_title" value="{{ internship.title }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Company Name:</label>
-                    <input type="text" name="company_name" value="{{ internship.company }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Location:</label>
-                    <input type="text" name="job_location" value="{{ internship.location }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Duration:</label>
-                    <input type="text" name="duration" value="{{ internship.duration }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Requirements:</label>
-                    <input type="text" name="job_type" value="{{ internship.requirements }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Salary:</label>
-                    <input type="text" name="salary" value="{{ internship.salary }}" required>
-                </div>
-                <div class="form-group">
-                    <label>Description:</label>
-                    <textarea name="job_description" required>{{ internship.description }}</textarea>
-                </div>
-                <button type="submit">Update Internship</button>
-            </form>
+        /* Header */
+        h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            font-size: 16px;
+            color: #34495e;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background-color: #1a2734;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #16a085;
+        }
+        
+            </style>
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <img src="{% static 'images/Bcommune_logo.png' %}" alt="Bcommune Logo">
+            </div>
+            <nav>
+                <a href="{% url 'myinternships' %}">View Internships</a>
+            </nav>
         </div>
+    </header>
+
+    <div class="form-container">
+        <h2>Edit Internship</h2>
+        <form id="editInternshipForm">
+            {% csrf_token %}
+            <label for="internship-title">Internship Title:</label>
+            <input type="text" id="internship-title" name="job_title" value="{{ internship.title }}" required>
+
+            <label for="company-name">Company Name:</label>
+            <input type="text" id="company-name" name="company_name" value="{{ internship.company }}" required>
+
+            <label for="internship-location">Location:</label>
+            <input type="text" id="internship-location" name="job_location" value="{{ internship.location }}" required>
+
+            <label for="duration">Internship Duration:</label>
+            <input type="text" id="duration" name="duration" value="{{ internship.duration }}" required>
+
+            <label for="internship-type">Internship Type:</label>
+            <select id="internship-type" name="job_type" required>
+                <option value="Remote" {% if internship.requirements == "Remote" %}selected{% endif %}>Remote</option>
+                <option value="On-site" {% if internship.requirements == "On-site" %}selected{% endif %}>On-site</option>
+                <option value="Hybrid" {% if internship.requirements == "Hybrid" %}selected{% endif %}>Hybrid</option>
+            </select>
+
+            <label for="stipend">Stipend:</label>
+            <input type="text" id="stipend" name="salary" value="{{ internship.stipend }}" required>
+
+            <label for="required-skills">Required Skills (comma-separated):</label>
+            <input type="text" id="required-skills" name="required_skills" value="{{ internship.required_skills }}" required>
+
+            <label for="min-experience">Minimum Experience (in years):</label>
+            <input type="number" id="min-experience" name="min_experience" value="{{ internship.min_experience }}" min="0" required>
+
+            <label for="required-qualification">Required Qualification:</label>
+            <select id="required-qualification" name="required_qualification" required>
+                <option value="bachelor" {% if internship.required_qualification == "bachelor" %}selected{% endif %}>Bachelor's</option>
+                <option value="master" {% if internship.required_qualification == "master" %}selected{% endif %}>Master's</option>
+                <option value="phd" {% if internship.required_qualification == "phd" %}selected{% endif %}>PhD</option>
+                <option value="diploma" {% if internship.required_qualification == "diploma" %}selected{% endif %}>Diploma</option>
+            </select>
+
+            <label for="description">Internship Description:</label>
+            <textarea id="description" name="job_description" required>{{ internship.description }}</textarea>
+
+            <button type="submit">Update Internship</button>
+        </form>
     </div>
+
     <script>
         document.getElementById('editInternshipForm').onsubmit = function(e) {
             e.preventDefault();
             const formData = new FormData(this);
-            fetch('/company/dashboard/myinternships/edit/{{ internship.id }}/', {
+            
+            fetch('{% url "edit_internship" internship.id %}', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -115,10 +137,11 @@ button:hover {
                     alert('Internship updated successfully.');
                     window.location.href = '{% url "myinternships" %}';
                 } else {
-                    alert(data.message);
+                    alert('Error: ' + data.message);
                 }
             })
             .catch(error => {
+                console.error('Error:', error);
                 alert('An error occurred while updating the internship.');
             });
         };
