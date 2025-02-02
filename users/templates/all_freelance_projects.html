@@ -161,6 +161,17 @@
                                 <p>Posted on: {{ project.created_at|date:"M d, Y" }}</p>
                             </div>
                             <a href="{% url 'place_freelance_bid' project.id %}" class="place-bid-btn">Place Bid</a>
+                            <form action="{% url 'toggle_bookmark' 'freelance' project.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">
+                                    {% if freelance.id in bookmarked_items %}
+                                        ❌ Unsave
+                                    {% else %}
+                                        ⭐ Save
+                                    {% endif %}
+                                </button>
+                            </form>
+                            
                         </div>
                     {% endfor %}
                 </div>

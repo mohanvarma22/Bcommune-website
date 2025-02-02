@@ -780,9 +780,17 @@ def all_internships(request):
     
     return render(request, 'all_internships.html', {'internships': internships})
 
+@login_required
 def all_freelance_projects(request):
     freelance_projects = FreelanceProject.objects.all().order_by('-created_at')
-    return render(request, 'all_freelance_projects.html', {'freelance_projects': freelance_projects})
+    
+    # Fetch bookmarked freelance projects for the logged-in user
+    bookmarked_freelance_projects = Bookmark.objects.filter(user=request.user).values_list('freelance_id', flat=True)
+
+    return render(request, 'all_freelance_projects.html', {
+        'freelance_projects': freelance_projects,
+        'bookmarked_freelance_projects': list(bookmarked_freelance_projects)
+    })
 
 
 def all_freelance_projects_company(request):
@@ -874,14 +882,19 @@ def toggle_bookmark(request, item_type, item_id):
     elif item_type == "core_opportunity":
         item = get_object_or_404(CoreOpportunity, id=item_id)
         bookmark, created = Bookmark.objects.get_or_create(user=request.user, core_opportunity=item)
-    
+    elif item_type == "idea":
+        item = get_object_or_404(Idea, id=item_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, idea=item)
+    elif item_type == "freelance":
+        item = get_object_or_404(FreelanceProject, id=item_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, freelance=item)  # ✅ Handle Idea Bookmark
     else:
         return redirect('individual_alljobs')
 
     if not created:
         bookmark.delete()  # Unsave if already saved
 
-    return redirect(request.META.get('HTTP_REFERER', 'individual_alljobs'))
+    return redirect(request.META.get('HTTP_REFERER', 'individual_dashboard'))
 @login_required
 def bookmarked_items(request):
     bookmarks = Bookmark.objects.filter(user=request.user)
@@ -899,10 +912,12 @@ def individual_allinternships(request):
 
     # Get the internship_id from URL parameters (if any)
     selected_internship_id = request.GET.get('internship_id')
+    bookmarked_internships = Bookmark.objects.filter(user=request.user).values_list('internship_id', flat=True)
 
     return render(request, 'individual_allinternships.html', {
         'internships': internships,
-        'selected_internship_id': selected_internship_id
+        'selected_internship_id': selected_internship_id,
+        'bookmarked_internships':list(bookmarked_internships)
     })
 
 def apply_job(request, job_id):
@@ -1144,8 +1159,15 @@ def core_form_view(request):
 
     return render(request, 'coreform.html', {'form': form})
 def opportunity_detail(request, pk):
-    opportunity = get_object_or_404(CoreOpportunity, pk=pk)
-    return render(request, 'opportunity_detail.html', {'opportunity': opportunity})
+    core_opportunity = get_object_or_404(CoreOpportunity, pk=pk)
+
+    # Check if the opportunity is bookmarked
+    bookmarked = Bookmark.objects.filter(user=request.user, core_opportunity=core_opportunity).exists()
+
+    return render(request, 'opportunity_detail.html', {
+        'core_opportunity': core_opportunity,  # ✅ Ensure correct variable name
+        'bookmarked': bookmarked
+    })
 
 def delete_opportunity(request, pk):
     opportunity = get_object_or_404(CoreOpportunity, pk=pk)

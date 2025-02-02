@@ -221,6 +221,16 @@
                     </div>
 
                     <a href="{% url 'explore_all_ideas_individual' %}" class="back-btn">Back to Ideas</a>
+                    <form action="{% url 'toggle_bookmark' 'idea' idea.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">
+                            {% if idea.id in bookmarked_ideas %}
+                                ❌ Unsave
+                            {% else %}
+                                ⭐ Save
+                            {% endif %}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

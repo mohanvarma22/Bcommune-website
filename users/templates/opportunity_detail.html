@@ -132,18 +132,22 @@
                 Connect
 
             </a>
-            <form action="{% url 'toggle_bookmark' 'core_opportunity' core_opportunity.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit">
-                    {% if bookmarked %}
-                        ❌ Unsave
-                    {% else %}
-                        ⭐ Save
-                    {% endif %}
-                </button>
-            </form>
-            
-        {% endif %}
+        {%endif%}
+            {% if core_opportunity.id %}
+                <form action="{% url 'toggle_bookmark' 'core_opportunity' core_opportunity.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">
+                        {% if bookmarked %}
+                            ❌ Unsave
+                        {% else %}
+                            ⭐ Save
+                        {% endif %}
+                    </button>
+                </form>
+            {% else %}
+                <p>Error: Opportunity not found.</p>
+            {% endif %}
+
     </div>
 </body>
 </html>

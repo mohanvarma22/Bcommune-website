@@ -119,6 +119,8 @@ class Bookmark(models.Model):
     job = models.ForeignKey('Job', on_delete=models.CASCADE, null=True, blank=True)
     internship = models.ForeignKey('Internship', on_delete=models.CASCADE, null=True, blank=True)
     core_opportunity = models.ForeignKey('CoreOpportunity', on_delete=models.CASCADE, null=True, blank=True)
+    idea = models.ForeignKey('Idea', on_delete=models.CASCADE, null=True, blank=True)
+    freelance=models.ForeignKey('FreelanceProject', on_delete=models.CASCADE, null=True, blank=True)
     saved_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -126,6 +128,8 @@ class Bookmark(models.Model):
             ('user', 'job'),
             ('user', 'internship'),
             ('user', 'core_opportunity'),
+            ('user','idea'),
+            ('user','freelance'),
         ]
 
     def __str__(self):
@@ -652,3 +656,4 @@ class CoreOpportunity(models.Model):
 
     def __str__(self):
         return self.opportunity_title
+      
