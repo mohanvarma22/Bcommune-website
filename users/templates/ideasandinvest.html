@@ -90,6 +90,7 @@
                                 <span>Posted on: {{ idea.created_at|date:"F d, Y H:i" }}</span>
                             </div>
                             <button class="delete-button" data-idea-id="{{ idea.id }}">Delete</button>
+                            <a href="{% url 'idea_detail_individual' idea.id %}" class="post-button" style="font-size: medium;">View Details</a>
                         </div>
                     {% endfor %}
                 {% else %}

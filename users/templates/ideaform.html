@@ -88,6 +88,30 @@ form .submit-btn:hover {
     margin-top: 20px;
 }
 
+.media-upload {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .media-upload p {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .media-upload input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        .media-upload .file-type {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 12px;
+        }
+
 @media (max-width: 768px) {
     .form-row {
         flex-direction: column;
@@ -175,12 +199,30 @@ form .submit-btn:hover {
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="upload-photo">Upload Photo</label>
-                        <input type="file" id="upload-photo" name="photo" accept="image/*">
+                        <label>Media</label>
+                        <div class="media-upload">
+                            <p>Upload photos and videos to showcase your idea</p>
+                            <input type="file" id="photo" name="photo" accept="image/*" multiple>
+                            <span class="file-type">Photos (JPG, PNG, GIF)</span>
+                            
+                            <input type="file" id="video" name="video" accept="video/*" multiple>
+                            <span class="file-type">Videos (MP4, MOV, AVI)</span>
+                        </div>
                     </div>
+                </div>
+
+                <div class="form-row">
                     <div class="form-group">
-                        <label for="upload-video">Upload Video</label>
-                        <input type="file" id="upload-video" name="video" accept="video/*">
+                        <label for="team">Team Information and Expertise</label>
+                        <textarea id="team" name="team_info" placeholder="Provide team details"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pitch-deck">Pitch Deck</label>
+                        <input type="file" id="pitch-deck" name="pitch_deck" accept=".pdf,.ppt,.pptx,.doc,.docx">
+                        <small style="color: #666; margin-top: 5px;">Upload your pitch deck (Accepted formats: PDF, PPT, PPTX, DOC, DOCX)</small>
                     </div>
                 </div>
 

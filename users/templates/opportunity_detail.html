@@ -1,153 +1,433 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opportunity Details</title>
+    <title>{{ idea.title }} - Idea Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #1a2734;
-            color: white;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: #fff;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #2c3e50;
+
+        .main-container {
+            max-width: 1200px;
+            margin: 20px auto;
             padding: 20px;
+            background-color: #2a2a2a;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        h1, h2 {
-            color: #ecf0f1;
+
+        .idea-header {
+            text-align: center;
         }
-        .detail-item {
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #34495e;
+
+        .idea-header h1 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+        }
+
+        .idea-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .idea-meta span {
+            background: #444;
+            padding: 5px 10px;
             border-radius: 5px;
         }
-        .detail-title {
-            font-weight: bold;
-            color: #3498db;
+
+        .idea-section {
+            margin: 20px 0;
         }
-        .connect-button, .delete-button {
+
+        .idea-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .idea-section p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .idea-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .fund-btn, .back-btn {
+            text-decoration: none;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #f04e31;
+            color: white;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .fund-btn:hover, .back-btn:hover {
+            background: #c03d25;
+        }
+
+        .reactions-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reaction-btn {
+            background: #444;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .reaction-btn.active {
+            background: #f04e31;
+        }
+
+        .reaction-btn i {
+            margin-right: 5px;
+        }
+
+        .reaction-count {
+            font-weight: bold;
+        }
+
+        video {
+            margin-top: 20px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .idea-meta {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .fund-btn, .back-btn {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+        }
+        .media-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .media-item {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .media-item h3 {
+            margin-top: 0;
+            color: #f04e31;
+        }
+
+        .media-content {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pitch-deck-section {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .pitch-deck-section a {
             display: inline-flex;
             align-items: center;
-            margin: 20px 0;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
+            background: #444;
+            color: #fff;
             text-decoration: none;
+            padding: 10px 15px;
             border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
+            transition: background 0.3s;
         }
-        .connect-button:hover, .delete-button:hover {
-            background-color: #0056b3;
+
+        .pitch-deck-section a:hover {
+            background: #555;
         }
-        .connect-button svg, .delete-button svg {
+
+        .pitch-deck-section i {
             margin-right: 8px;
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-        .delete-button {
-            background-color: #e74c3c;
-        }
-        .delete-button:hover {
-            background-color: #c0392b;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{{ opportunity.opportunity_title }}</h1>
-        
-        <div class="detail-item">
-            <span class="detail-title">Role Details:</span>
-            <p>{{ opportunity.role_details }}</p>
-        </div>
+    <div class="main-container">
+        <div class="idea-detail-container" data-idea-id="{{ idea.id }}" data-initial-like-state="{{ user_reaction|default_if_none:'' }}">
+            <div class="idea-header">
+                <h1>{{ idea.title }}</h1>
+                <div class="idea-meta">
+                    <span class="category">{{ idea.category }}</span>
+                    <span class="fund">${{ idea.fund }}</span>
+                    <span class="date">Posted {{ idea.created_at|timesince }} ago</span>
+                </div>
+            </div>
 
-        <div class="detail-item">
-            <span class="detail-title">Key Objectives:</span>
-            <p>{{ opportunity.key_objectives }}</p>
-        </div>
+            <!-- Media Section -->
+            {% if idea.photo or idea.video %}
+            <div class="media-section">
+                {% if idea.photo %}
+                <div class="media-item">
+                    <h3>Project Images</h3>
+                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" class="media-content">
+                </div>
+                {% endif %}
 
-        <div class="detail-item">
-            <span class="detail-title">Expertise Required:</span>
-            <p>{{ opportunity.expertise }}</p>
-        </div>
-
-        <div class="detail-item">
-            <span class="detail-title">Opportunity Type:</span>
-            <p>{{ opportunity.opportunity_type }}</p>
-        </div>
-
-        <div class="detail-item">
-            <span class="detail-title">Requirements:</span>
-            <p>{{ opportunity.requirements }}</p>
-        </div>
-
-        <div class="detail-item">
-            <span class="detail-title">Compensation:</span>
-            <p>{{ opportunity.compensation }}</p>
-            {% if opportunity.compensation == "Equity-Based" %}
-                <p><strong>Equity Percentage:</strong> {{ opportunity.equity_percentage }}%</p>
-            {% elif opportunity.compensation == "Paid Opportunity" %}
-                <p><strong>Salary:</strong> {{ opportunity.salary }}</p>
-            {% elif opportunity.compensation == "Other" %}
-                <p><strong>Other Compensation:</strong> {{ opportunity.other_compensation }}</p>
-            {% endif %}
-        </div>
-
-        {% if opportunity.location %}
-            <div class="detail-item">
-                <span class="detail-title">Location:</span>
-                <p>{{ opportunity.location }}</p>
-                {% if opportunity.location_details %}
-                    <p><strong>Details:</strong> {{ opportunity.location_details }}</p>
+                {% if idea.video %}
+                <div class="media-item">
+                    <h3>Demo Video</h3>
+                    <video controls class="media-content">
+                        <source src="{{ idea.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
                 {% endif %}
             </div>
-        {% endif %}
-
-        <div class="detail-item">
-            <span class="detail-title">NDA:</span>
-            <p>{{ opportunity.nda|yesno:"Yes,No" }}</p>
-        </div>
-
-        {% if opportunity.user == request.user %}
-            <!-- If the opportunity belongs to the current user, show the delete button only -->
-            <a href="{% url 'delete_opportunity' opportunity.pk %}" class="delete-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v2h6v-2h-6zm3 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm5-10h-3v-1c0-.55-.45-1-1-1s-1 .45-1 1v1h-6v-1c0-.55-.45-1-1-1s-1 .45-1 1v1h-3c-1.1 0-1.99.9-1.99 2l.01 14c0 1.1.9 2 1.99 2h14c1.1 0 1.99-.9 1.99-2l-.01-14c0-1.1-.89-2-1.99-2zm-7 15c0 .55-.45 1-1 1s-1-.45-1-1v-4h2v4zm-6-4v4h2v-4h-2zm11 4h-6v-5h6v5z"/></svg>
-                Delete Opportunity
-            </a>
-        {% else %}
-            <!-- If the opportunity does not belong to the current user, show the connect button -->
-            <a 
-                href="mailto:{{ opportunity.user.email }}?subject=Connecting for Opportunity: {{ opportunity.opportunity_title }}&body=Dear {{ opportunity.user.get_full_name }},%0D%0A%0D%0AI am interested in your opportunity titled '{{ opportunity.opportunity_title }}'. Please let me know how we can collaborate.%0D%0A%0D%0AThank you,%0D%0A{{ request.user.get_full_name }}"
-                class="connect-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12.713l-11.999-7.713 24-.001-12.001 7.714zm12 1.543v7.744h-24v-7.744l12 7.729 12-7.729zm-24-9.256v-3h24v3l-12 7.714-12-7.714z"/></svg>
-                Connect
-
-            </a>
-        {%endif%}
-            {% if core_opportunity.id %}
-                <form action="{% url 'toggle_bookmark' 'core_opportunity' core_opportunity.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">
-                        {% if bookmarked %}
-                            ❌ Unsave
-                        {% else %}
-                            ⭐ Save
-                        {% endif %}
-                    </button>
-                </form>
-            {% else %}
-                <p>Error: Opportunity not found.</p>
             {% endif %}
 
+            <div class="idea-content">
+                <section class="idea-section">
+                    <h2>Brief Description</h2>
+                    <p>{{ idea.brief_description }}</p>
+                </section>
+
+                {% if idea.patent_number %}
+                <section class="idea-section">
+                    <h2>Patent Information</h2>
+                    <p><strong>Patent Number:</strong> {{ idea.patent_number }}</p>
+                    {% if idea.application_number %}
+                    <p><strong>Application Number:</strong> {{ idea.application_number }}</p>
+                    {% endif %}
+                </section>
+                {% endif %}
+
+                <section class="idea-section">
+                    <h2>Problem Statement</h2>
+                    <p>{{ idea.problem_statement }}</p>
+                </section>
+
+                <section class="idea-section">
+                    <h2>Solution</h2>
+                    <p>{{ idea.solution }}</p>
+                </section>
+
+                {% if idea.pitch_deck %}
+                <section class="pitch-deck-section">
+                    <h2>Pitch Deck</h2>
+                    <a href="{{ idea.pitch_deck.url }}" target="_blank">
+                        <i class="fas fa-file-powerpoint"></i>
+                        View Pitch Deck
+                    </a>
+                </section>
+                {% endif %}
+
+                {% if idea.details %}
+                <section class="idea-section">
+                    <h2>Additional Details</h2>
+                    <p>{{ idea.details }}</p>
+                </section>
+                {% endif %}
+
+                {% if idea.team_info %}
+                <section class="idea-section">
+                    <h2>Team Information</h2>
+                    <p>{{ idea.team_info }}</p>
+                </section>
+                {% endif %}
+
+                <section class="idea-section">
+                    <h2>Visibility</h2>
+                    <p>{{ idea.visibility|capfirst }}</p>
+                </section>
+
+                <section class="idea-section">
+                    <h2>Contact Email</h2>
+                    <p>{{ idea.email }}</p>
+                </section>
+
+                <div class="idea-actions">
+                    <a href="mailto:{{ idea.email }}?subject=Interest in {{ idea.title }}&body=Hello,%0D%0A%0D%0AI am interested in your idea titled '{{ idea.title }}'.%0D%0A%0D%0AHere are some questions I have:%0D%0A%0D%0A(Your Message Here)%0D%0A%0D%0AThank you!" class="fund-btn">
+                        Show Interest
+                    </a>
+
+                    <div class="reactions-container">
+                        <button id="like-btn" class="reaction-btn like-btn">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span id="like-count" class="reaction-count">{{ idea.likes }}</span>
+                        </button>
+
+                        <button id="dislike-btn" class="reaction-btn dislike-btn">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span id="dislike-count" class="reaction-count">{{ idea.dislikes }}</span>
+                        </button>
+                    </div>
+
+                    <a href="{% url 'explore_all_ideas_individual' %}" class="back-btn">Back to Ideas</a>
+                    <form action="{% url 'toggle_bookmark' 'idea' idea.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">
+                            {% if idea.id in bookmarked_ideas %}
+                                ❌ Unsave
+                            {% else %}
+                                ⭐ Save
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+            
+
+    <script>
+        let likeState = false;
+        let dislikeState = false;
+
+        function showError(message) {
+            alert(message);
+        }
+
+        function updateButtonStates() {
+            const likeBtn = document.getElementById('like-btn');
+            const dislikeBtn = document.getElementById('dislike-btn');
+
+            if (likeBtn && dislikeBtn) {
+                likeBtn.classList.toggle('active', likeState);
+                dislikeBtn.classList.toggle('active', dislikeState);
+            }
+        }
+
+        function animateCount(element, start, end) {
+            if (!element) return;
+
+            const duration = 500;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                const current = Math.round(start + (end - start) * progress);
+                element.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        async function handleReaction(action, ideaId) {
+            const likeCountElement = document.getElementById("like-count");
+            const dislikeCountElement = document.getElementById("dislike-count");
+
+            if (!likeCountElement || !dislikeCountElement) {
+                console.error("Count elements not found");
+                return;
+            }
+
+            const currentLikes = parseInt(likeCountElement.textContent) || 0;
+            const currentDislikes = parseInt(dislikeCountElement.textContent) || 0;
+
+            try {
+                const response = await fetch(`/${action}/${ideaId}/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        showError("Please log in to react to ideas");
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (typeof data.likes === 'number' && typeof data.dislikes === 'number') {
+                    animateCount(likeCountElement, currentLikes, data.likes);
+                    animateCount(dislikeCountElement, currentDislikes, data.dislikes);
+
+                    if (action === 'like') {
+                        likeState = !likeState;
+                        if (likeState) dislikeState = false;
+                    } else {
+                        dislikeState = !dislikeState;
+                        if (dislikeState) likeState = false;
+                    }
+
+                    updateButtonStates();
+                } else {
+                    console.error("Invalid response format", data);
+                    showError("An error occurred while updating the reaction");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError("An error occurred while processing your reaction");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ideaContainer = document.querySelector('[data-idea-id]');
+            if (ideaContainer) {
+                const ideaId = ideaContainer.dataset.ideaId;
+                const initialLikeState = ideaContainer.dataset.initialLikeState;
+
+                likeState = initialLikeState === 'liked';
+                dislikeState = initialLikeState === 'disliked';
+
+                updateButtonStates();
+
+                const likeBtn = document.getElementById('like-btn');
+                const dislikeBtn = document.getElementById('dislike-btn');
+
+                if (likeBtn) {
+                    likeBtn.addEventListener('click', () => handleReaction('like', ideaId));
+                }
+
+                if (dislikeBtn) {
+                    dislikeBtn.addEventListener('click', () => handleReaction('dislike', ideaId));
+                }
+            }
+        });
+    </script>
 </body>
 </html>

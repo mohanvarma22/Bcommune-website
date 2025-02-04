@@ -693,7 +693,14 @@ def post_freelance(request):
         form = FreelanceProjectForm(request.POST, request.FILES)
         if form.is_valid():
             project_data = form.cleaned_data
-            request.session['project_data'] = project_data  # Save form data in session for preview
+            # Remove 'attachments' from session data as it is a file
+            project_data.pop('attachments', None)
+            request.session['project_data'] = project_data  # Save only non-file data
+            request.session['file_uploaded'] = True  # Indicate that a file was uploaded
+            
+            # Temporarily save the file in session storage
+            request.session['file_name'] = request.FILES['attachments'].name
+            
             return redirect('preview_freelance_project')
     else:
         form = FreelanceProjectForm()

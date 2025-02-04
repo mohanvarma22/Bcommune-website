@@ -133,6 +133,55 @@
                 padding: 8px 15px;
             }
         }
+        .media-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .media-item {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .media-item h3 {
+            margin-top: 0;
+            color: #f04e31;
+        }
+
+        .media-content {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pitch-deck-section {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .pitch-deck-section a {
+            display: inline-flex;
+            align-items: center;
+            background: #444;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .pitch-deck-section a:hover {
+            background: #555;
+        }
+
+        .pitch-deck-section i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -147,10 +196,26 @@
                 </div>
             </div>
 
-            {% if idea.photo %}
-                <div class="idea-section">
-                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}">
+            <!-- Media Section -->
+            {% if idea.photo or idea.video %}
+            <div class="media-section">
+                {% if idea.photo %}
+                <div class="media-item">
+                    <h3>Project Images</h3>
+                    <img src="{{ idea.photo.url }}" alt="{{ idea.title }}" class="media-content">
                 </div>
+                {% endif %}
+
+                {% if idea.video %}
+                <div class="media-item">
+                    <h3>Demo Video</h3>
+                    <video controls class="media-content">
+                        <source src="{{ idea.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                {% endif %}
+            </div>
             {% endif %}
 
             <div class="idea-content">
@@ -160,13 +225,13 @@
                 </section>
 
                 {% if idea.patent_number %}
-                    <section class="idea-section">
-                        <h2>Patent Information</h2>
-                        <p><strong>Patent Number:</strong> {{ idea.patent_number }}</p>
-                        {% if idea.application_number %}
-                            <p><strong>Application Number:</strong> {{ idea.application_number }}</p>
-                        {% endif %}
-                    </section>
+                <section class="idea-section">
+                    <h2>Patent Information</h2>
+                    <p><strong>Patent Number:</strong> {{ idea.patent_number }}</p>
+                    {% if idea.application_number %}
+                    <p><strong>Application Number:</strong> {{ idea.application_number }}</p>
+                    {% endif %}
+                </section>
                 {% endif %}
 
                 <section class="idea-section">
@@ -179,28 +244,28 @@
                     <p>{{ idea.solution }}</p>
                 </section>
 
+                {% if idea.pitch_deck %}
+                <section class="pitch-deck-section">
+                    <h2>Pitch Deck</h2>
+                    <a href="{{ idea.pitch_deck.url }}" target="_blank">
+                        <i class="fas fa-file-powerpoint"></i>
+                        View Pitch Deck
+                    </a>
+                </section>
+                {% endif %}
+
                 {% if idea.details %}
-                    <section class="idea-section">
-                        <h2>Additional Details</h2>
-                        <p>{{ idea.details }}</p>
-                    </section>
+                <section class="idea-section">
+                    <h2>Additional Details</h2>
+                    <p>{{ idea.details }}</p>
+                </section>
                 {% endif %}
 
                 {% if idea.team_info %}
-                    <section class="idea-section">
-                        <h2>Team Information</h2>
-                        <p>{{ idea.team_info }}</p>
-                    </section>
-                {% endif %}
-
-                {% if idea.video %}
-                    <section class="idea-section">
-                        <h2>Demo Video</h2>
-                        <video controls>
-                            <source src="{{ idea.video.url }}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </section>
+                <section class="idea-section">
+                    <h2>Team Information</h2>
+                    <p>{{ idea.team_info }}</p>
+                </section>
                 {% endif %}
 
                 <div class="idea-actions">
@@ -235,6 +300,7 @@
             </div>
         </div>
     </div>
+            
 
     <script>
         let likeState = false;

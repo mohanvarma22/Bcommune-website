@@ -58,6 +58,7 @@ class Idea(models.Model):
     category = models.CharField(max_length=100)
     photo = models.ImageField(upload_to='idea_photos/', blank=True, null=True)
     video = models.FileField(upload_to='idea_videos/', blank=True, null=True)
+    pitch_deck = models.FileField(upload_to='pitch_decks/', blank=True, null=True)
     team_info = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(null=True, blank=True)
