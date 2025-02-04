@@ -187,7 +187,7 @@
         function confirmDelete(internshipId) {
             if (confirm("Are you sure you want to delete this internship?")) {
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                fetch(/delete_internship/${internshipId}/, {
+                fetch(`/delete_internship/${internshipId}/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': csrfToken,
